@@ -123,7 +123,7 @@
             text-align: center; box-shadow: 0 0 25px rgba(57, 255, 20, 0.4);
         }
 
-        /* 🔥 HỆ THỐNG QUẢN TRỊ ẨN ĐỘC QUYỀN ADMIN */
+        /* HỆ THỐNG QUẢN TRỊ ẨN ĐỘC QUYỀN ADMIN */
         #admin-panel, #admin-history-panel { display: none; }
         #admin-panel { border-color: var(--neon-pink); }
         #admin-history-panel { border-color: var(--neon-green); }
@@ -139,7 +139,7 @@
     <div>
         <div class="card">
             <h2>👤 THÔNG TIN ĐẶT MÓN</h2>
-            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 10px;">
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 10px; margin-bottom: 10px;">
                 <div>
                     <label>Tên khách hàng:</label>
                     <input type="text" id="customer-name" placeholder="Nhập tên của bạn...">
@@ -154,6 +154,10 @@
                         <option value="Sân 5">Sân 5</option>
                     </select>
                 </div>
+            </div>
+            <div>
+                <label>Chú thích / Ghi chú yêu cầu thêm (nếu có):</label>
+                <input type="text" id="customer-notes" placeholder="Ví dụ: Ít đá, không đường, lấy thêm ly đá..." style="margin-bottom: 0;">
             </div>
         </div>
 
@@ -260,6 +264,14 @@
     let cart = [];
     let isAdminVerified = false;
 
+    // 🔥 TỰ ĐỘNG KIỂM TRA VÀ ĐIỀN TÊN KHÁCH CŨ NẾU CÓ LƯU TRÊN THIẾT BỊ
+    window.addEventListener('DOMContentLoaded', function() {
+        const savedCustomerName = localStorage.getItem('phucan_saved_username');
+        if (savedCustomerName) {
+            document.getElementById('customer-name').value = savedCustomerName;
+        }
+    });
+
     // ĐỒNG BỘ THỰC ĐƠN TỪ FIREBASE REALTIME
     database.ref('menu_products').on('value', function(snapshot) {
         const data = snapshot.val();
@@ -319,8 +331,8 @@
             document.getElementById('admin-panel').style.display = 'block';
             document.getElementById('admin-history-panel').style.display = 'block';
             document.querySelectorAll('.btn-delete-p').forEach(btn => btn.style.display = 'block');
-            cleanOldOrders();   // Thực hiện quét dọn tự động đơn quá 10 ngày khi admin đăng nhập
-            listenAdminOrders(); // Bật tính năng theo dõi lịch sử
+            cleanOldOrders();   
+            listenAdminOrders(); 
         } else {
             alert("❌ Sai mật khẩu hệ thống!");
         }
@@ -424,23 +436,34 @@
     function processOrder(method) {
         const customer = document.getElementById('customer-name').value.trim();
         const court = document.getElementById('court-number').value;
+        const notes = document.getElementById('customer-notes').value.trim(); // Lấy dữ liệu chú thích
         let total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
         const orderCode = "PA" + Math.floor(1000 + Math.random() * 9000); 
 
-        // Đính kèm trường timestamp (Mili-giây hiện tại) để phục vụ cho việc tự động xóa sau 10 ngày
+        // 🔥 GHI NHỚ TÊN KHÁCH HÀNG VÀO MÁY CHO LẦN SAU KHÔNG PHẢI GÕ LẠI
+        localStorage.setItem('phucan_saved_username', customer);
+
         const orderData = {
             orderCode: orderCode,
             customer: customer,
             court: court,
             total: total,
             payment: method,
+            notes: notes ? notes : "Không có ghi chú", // Đẩy chú thích lên hệ thống
             items: cart.slice(),
             time: new Date().toLocaleString(),
             timestamp: Date.now() 
         };
 
-        const paymentStr = (method === 'CASH') ? '💵 Tiền mặt tại quầy' : '💳 Chuyển khoản ngân hàng';
-        saveAndSendOrder(orderData, paymentStr);
+        // 🔥 TẠO CHUỖI THÔNG BÁO TELEGRAM IN ĐẬM, VIẾT HOA CỰC TO RÕ RÀNG CHO NHÂN VIÊN
+        let paymentStrTelegram = "";
+        if (method === 'CASH') {
+            paymentStrTelegram = "🟢 <b>[ KHÁCH TRẢ TIỀN MẶT ]</b> 🟢";
+        } else {
+            paymentStrTelegram = "🔵 <b>[ KHÁCH CHUYỂN KHOẢN ]</b> 🔵";
+        }
+
+        saveAndSendOrder(orderData, paymentStrTelegram);
     }
 
     // LƯU ĐƠN VÀ PHÁT TIN THÔNG BÁO
@@ -453,27 +476,28 @@
             let textAlert = "📍 Vị trí nhận: " + order.court + "\n" +
                         "👤 Khách hàng: " + order.customer + "\n" +
                         "💰 Trị giá bill: " + order.total.toLocaleString() + "đ\n" +
-                        "💳 Hình thức: " + (order.payment === 'CASH' ? 'Tiền mặt' : 'Chuyển khoản') + "\n\n" +
-                        "Đơn hàng của bạn đã gửi thành công báo cho nhân viên trực quầy. Đồ ăn/thức uống sẽ được giao đến sân ngay lập tức!";
+                        "💳 Thanh toán: " + (order.payment === 'CASH' ? 'Tiền mặt' : 'Chuyển khoản') + "\n" +
+                        "✍️ Chú thích đơn: " + order.notes + "\n\n" +
+                        "Đơn hàng của bạn đã gửi THÀNH CÔNG báo cho nhân viên trực quầy. Đồ ăn/thức uống sẽ được giao đến tận sân ngay lập tức!";
             openSuccessModal(textAlert);
             
-            // Kích hoạt dọn dẹp đơn cũ ngầm
             cleanOldOrders();
         })
         .catch(function(err) {
             alert("❌ Lỗi gửi đơn hàng lên hệ thống: " + err.message);
         });
 
-        // Phát tin báo về nhóm/kênh Telegram Admin
+        // 🔥 PHÁT TIN TELEGRAM TO RÕ RÀNG CHO NHÂN VIÊN (HIỂN THỊ CẢ CHÚ THÍCH)
         let itemsListStr = order.items.map(function(i) { return "• " + i.name + " (x" + i.quantity + ")"; }).join("\n");
         let msg = "🔔 <b>ĐƠN HÀNG MỚI TẠI SÂN</b>\n" +
                   "----------------------------------\n" +
-                  "📍 Giao đến: <b>" + order.court + "</b>\n" +
-                  "👤 Tên khách: <b>" + order.customer + "</b>\n" +
-                  "💰 Giá tiền hóa đơn: <b>" + order.total.toLocaleString() + "đ</b>\n" +
-                  "💳 Hình thức: " + paymentStr + "\n" +
-                  "🔠 Mã đơn hàng: <b>" + order.orderCode + "</b>\n" +
-                  "📦 <b>Danh sách món chọn:</b>\n" + itemsListStr;
+                  "📍 SÂN GIAO: <b>" + order.court.toUpperCase() + "</b>\n" +
+                  "👤 TÊN KHÁCH: <b>" + order.customer.toUpperCase() + "</b>\n" +
+                  "💰 TỔNG TIỀN: <b>" + order.total.toLocaleString() + "đ</b>\n" +
+                  "⚠️ HÌNH THỨC: " + paymentStr + "\n" + // Chữ to rõ nằm ở dòng này
+                  "✍️ CHÚ THÍCH: <i>" + order.notes + "</i>\n" + // Hiện chú thích rõ ràng
+                  "🔠 Mã đơn: <b>" + order.orderCode + "</b>\n\n" +
+                  "📦 <b>DANH SÁCH MÓN ĐẶT:</b>\n" + itemsListStr;
 
         const url = "https://api.telegram.org/bot" + TELEGRAM_CONFIG.token + "/sendMessage";
         fetch(url, {
@@ -483,28 +507,26 @@
         }).catch(function(err) { console.error("Lỗi Telegram:", err); });
     }
 
-    // 🔥 THUẬT TOÁN TỰ ĐỘNG XÓA LỊCH SỬ CŨ HƠN 10 NGÀY
+    // THUẬT TOÁN TỰ ĐỘNG XÓA LỊCH SỬ CŨ HƠN 10 NGÀY
     function cleanOldOrders() {
-        const tenDaysInMs = 10 * 24 * 60 * 60 * 1000; // Quy đổi 10 ngày ra mili-giây
-        const cutOffTimestamp = Date.now() - tenDaysInMs; // Mốc thời gian giới hạn
+        const tenDaysInMs = 10 * 24 * 60 * 60 * 1000; 
+        const cutOffTimestamp = Date.now() - tenDaysInMs; 
         
-        // Truy vấn tìm tất cả đơn hàng có mã timestamp nhỏ hơn mốc giới hạn và thực hiện xóa bỏ
         database.ref('orders_history').orderByChild('timestamp').endAt(cutOffTimestamp).once('value', function(snapshot) {
             snapshot.forEach(function(childSnapshot) {
                 childSnapshot.ref.remove();
-                console.log("Đã tự động xóa 1 đơn hàng cũ vượt quá hạn định 10 ngày.");
+                console.log("Đã tự động dọn dẹp đơn cũ quá hạn 10 ngày khỏi Firebase.");
             });
         });
     }
 
     function finishCheckout() {
         cart = [];
-        tempSavedOrderData = null;
-        document.getElementById('customer-name').value = '';
+        document.getElementById('customer-notes').value = ''; // Reset ô ghi chú sau khi đặt thành công
         updateCartState();
     }
 
-    // ĐỒNG BỘ HIỂN THỊ VÀO BẢNG LỊCH SỬ ẨN CỦA ADMIN
+    // ĐỒNG BỘ HIỂN THỊ VÀO BẢNG LỊCH SỬ ẨN CỦA ADMIN (LÀM TO RÕ NHÃN PHƯƠNG THỨC)
     function listenAdminOrders() {
         database.ref('orders_history').limitToLast(30).on('value', function(snapshot) {
             const data = snapshot.val();
@@ -514,14 +536,23 @@
             
             for(let key in data) {
                 let o = data[key];
-                let hinhThuc = (o.payment === 'CASH') ? '💵 Tiền mặt' : '💳 Chuyển khoản';
+                
+                // 🔥 Nhãn nổi bật to rõ phân biệt Tiền mặt / Chuyển khoản trong Lịch sử Admin
+                let hinhThucLabel = "";
+                if (o.payment === 'CASH') {
+                    hinhThucLabel = '<span style="font-size: 14px; font-weight: bold; background: #ff9900; color: #000; padding: 3px 10px; border-radius: 5px;">🚨 TIỀN MẶT</span>';
+                } else {
+                    hinhThucLabel = '<span style="font-size: 14px; font-weight: bold; background: #00f2fe; color: #000; padding: 3px 10px; border-radius: 5px;">🚨 CHUYỂN KHOẢN</span>';
+                }
+                
                 let chitietMon = o.items.map(function(i) { return i.name + ' (x' + i.quantity + ')'; }).join(', ');
                 
                 box.innerHTML += '<div class="order-row">' +
-                                 '📍 <b>' + o.court + ' - Khách: ' + o.customer + '</b> [Mã Đơn: ' + o.orderCode + ']<br>' +
-                                 '📦 Đồ gọi: <span style="color:var(--neon-blue);">' + chitietMon + '</span><br>' +
-                                 '💰 Tổng tiền: <b>' + o.total.toLocaleString() + 'đ</b> — Hình thức: <span style="color:#ff9900;">' + hinhThuc + '</span><br>' +
-                                 '🕒 Thời gian đặt đơn: <span style="color:#718096;">' + o.time + '</span>' +
+                                 '📍 <b>' + o.court + ' — Khách: ' + o.customer + '</b> [Mã Đơn: ' + o.orderCode + ']<br>' +
+                                 '📦 Món đặt: <span style="color:var(--neon-blue); font-weight:bold;">' + chitietMon + '</span><br>' +
+                                 '✍️ Chú thích: <span style="color:var(--neon-pink); font-style:italic;">' + (o.notes ? o.notes : "Không có") + '</span><br>' +
+                                 '💰 Tổng tiền: <b>' + o.total.toLocaleString() + 'đ</b> —— ' + hinhThucLabel + '<br>' +
+                                 '🕒 Thời gian: <span style="color:#718096;">' + o.time + '</span>' +
                                  '</div>';
             }
         });
