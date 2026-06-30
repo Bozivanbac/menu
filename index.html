@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Phúc An Badminton - Menu Tự Động</title>
-    <!-- Thư viện Firebase -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     
@@ -112,8 +111,7 @@
         .modal-btn-group { display: flex; gap: 10px; margin-top: 15px; }
         .btn-modal-close { background: #4a5568; color: white; margin-top: 15px; }
         
-        #qr-modal-section { display: none; margin-top: 15px; background: #fff; padding: 18px; border-radius: 12px; color: #000; }
-        #qr-image { max-width: 170px; margin-top: 5px; width: 100%; border: 1px solid #eee; border-radius: 8px; }
+        #qr-modal-section { display: none; }
         
         /* POPUP THÔNG BÁO HOÀN TẤT ĐƠN (BẤM ĐÂU CŨNG ĐÓNG) */
         .success-overlay {
@@ -141,7 +139,6 @@
 
 <div class="container">
     <div>
-        <!-- THÔNG TIN KHÁCH HÀNG -->
         <div class="card">
             <h2>👤 THÔNG TIN ĐẶT MÓN</h2>
             <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 10px;">
@@ -162,7 +159,6 @@
             </div>
         </div>
 
-        <!-- MENU GỌI MÓN PHÂN DANH MỤC -->
         <div class="card">
             <h2>🏸 MENU GỌI MÓN TỰ ĐỘNG</h2>
             
@@ -173,7 +169,6 @@
             <div class="product-grid" id="accessory-list"></div>
         </div>
 
-        <!-- PANEL ADMIN (MẬT KHẨU PhucAn2026$ MỚI HIỆN) -->
         <div class="card" id="admin-panel">
             <h2>🛠️ HỆ THỐNG QUẢN TRỊ KHO HÀNG</h2>
             <label>Tên mặt hàng mới:</label>
@@ -188,14 +183,12 @@
             <button class="btn btn-admin" onclick="adminAddProduct()">➕ ĐƯA LÊN HỆ THỐNG TRỰC TUYẾN</button>
         </div>
 
-        <!-- BẢNG LỊCH SỬ CHO NHÂN VIÊN QUẦY CANH -->
         <div class="card" id="staff-panel">
             <h2>🚨 BẢNG KIỂM SOÁT ĐƠN HÀNG (NHÂN VIÊN)</h2>
             <div id="staff-orders-list"></div>
         </div>
     </div>
 
-    <!-- GIỎ HÀNG PHỤ (CHỈ HIỆN TRÊN MÁY TÍNH) -->
     <div class="desktop-cart-panel">
         <div class="card">
             <h2>🛒 GIỎ HÀNG CỦA BẠN</h2>
@@ -208,7 +201,6 @@
     </div>
 </div>
 
-<!-- THANH GIỎ HÀNG NỔI ĐÁY MÀN HÌNH -->
 <div class="mobile-cart-bar" id="mobile-cart-sticky" style="display: none;">
     <div style="text-align: left;">
         <span style="font-size: 12px; color: #a0aec0;">🛒 Đã chọn mua:</span>
@@ -219,7 +211,6 @@
     </button>
 </div>
 
-<!-- POPUP THANH TOÁN -->
 <div class="modal-overlay" id="checkout-modal">
     <div class="modal-box">
         <div class="modal-title" id="modal-header-title">Chọn Thanh Toán</div>
@@ -237,7 +228,6 @@
     </div>
 </div>
 
-<!-- GIAO DIỆN POPUP THÀNH CÔNG CHÍNH GIỮA MÀN HÌNH (BẤM RA NGOÀI HOẶC NÚT ĐỀU ĐÓNG ĐƯỢC) -->
 <div class="success-overlay" id="success-modal" onclick="closeSuccessModal()">
     <div class="success-box" onclick="event.stopPropagation()">
         <div style="font-size: 3.5rem; margin-bottom: 10px;">🎉</div>
@@ -247,7 +237,6 @@
     </div>
 </div>
 
-<!-- Nút ngầm mở quyền quản lý -->
 <div class="admin-login-trigger" onclick="triggerAdminLogin()">🔒 Quản lý hệ thống Phúc An</div>
 
 <script>
@@ -284,7 +273,7 @@
     let tempSavedOrderData = null;
 
     // ĐỒNG BỘ THỰC ĐƠN TỪ FIREBASE REALTIME
-    database.ref('menu_products').on('value', (snapshot) => {
+    database.ref('menu_products').on('value', function(snapshot) {
         const data = snapshot.val();
         products = [];
         if (data) {
@@ -306,25 +295,24 @@
 
             let actionControlsHTML = '';
             if (qty > 0) {
-                actionControlsHTML = `
-                    <div style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 5px;">
-                        <button class="btn-qty" onclick="decreaseQuantity('${p.id}')">−</button>
-                        <span style="font-weight: bold; font-size: 15px; min-width: 18px;">${qty}</span>
-                        <button class="btn-qty" onclick="increaseQuantity('${p.id}')">+</button>
-                    </div>
-                `;
+                actionControlsHTML = 
+                    '<div style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 5px;">' +
+                        '<button class="btn-qty" onclick="decreaseQuantity(\'' + p.id + '\')">−</button>' +
+                        '<span style="font-weight: bold; font-size: 15px; min-width: 18px;">' + qty + '</span>' +
+                        '<button class="btn-qty" onclick="increaseQuantity(\'' + p.id + '\')">+</button>' +
+                    '</div>';
             } else {
-                actionControlsHTML = `<button class="btn" onclick="addToCart('${p.id}')">Thêm vào giỏ</button>`;
+                actionControlsHTML = '<button class="btn" onclick="addToCart(\'' + p.id + '\')">Thêm vào giỏ</button>';
             }
 
-            const itemHTML = `
-                <div class="product-item">
-                    <button class="btn-delete-p" id="del-${p.id}" onclick="adminDeleteProduct('${p.id}')">❌</button>
-                    <div class="p-name">${p.name}</div>
-                    <div class="p-price">${p.price.toLocaleString()}đ</div>
-                    ${actionControlsHTML}
-                </div>
-            `;
+            const itemHTML = 
+                '<div class="product-item">' +
+                    '<button class="btn-delete-p" id="del-' + p.id + '" onclick="adminDeleteProduct(\'' + p.id + '\')">❌</button>' +
+                    '<div class="p-name">' + p.name + '</div>' +
+                    '<div class="p-price">' + p.price.toLocaleString() + 'đ</div>' +
+                    actionControlsHTML +
+                '</div>';
+                
             if (p.category === 'accessory') { accessoryGrid.innerHTML += itemHTML; hasAccessory = true; }
             else { drinkGrid.innerHTML += itemHTML; hasDrink = true; }
         });
@@ -366,14 +354,14 @@
 
     function adminDeleteProduct(productId) {
         if (!isAdminVerified) return;
-        if (confirm("Xác nhận xóa món này?")) database.ref(`menu_products/${productId}`).remove();
+        if (confirm("Xác nhận xóa món này?")) database.ref('menu_products/' + productId).remove();
     }
 
     // LOGIC GIỎ HÀNG NHANH
     function addToCart(productId) {
         const product = products.find(p => p.id === productId);
         const itemInCart = cart.find(item => item.id === productId);
-        if (itemInCart) itemInCart.quantity += 1; else cart.push({ ...product, quantity: 1 });
+        if (itemInCart) itemInCart.quantity += 1; else cart.push(Object.assign({}, product, { quantity: 1 }));
         updateCartState();
     }
 
@@ -414,7 +402,7 @@
         let html = '', total = 0;
         cart.forEach(item => {
             let itemTotal = item.price * item.quantity; total += itemTotal;
-            html += `<div class="cart-item"><span>${item.name} <b>x${item.quantity}</b></span><span style="color:var(--neon-blue);">${itemTotal.toLocaleString()}đ</span></div>`;
+            html += '<div class="cart-item"><span>' + item.name + ' <b>x' + item.quantity + '</b></span><span style="color:var(--neon-blue);">' + itemTotal.toLocaleString() + 'đ</span></div>';
         });
         content.innerHTML = html; totalSpan.innerText = total.toLocaleString() + 'đ';
     }
@@ -458,93 +446,73 @@
             court: court,
             total: total,
             payment: method,
-            items: [...cart],
+            items: cart.slice(),
             time: new Date().toLocaleString()
         };
 
         if (method === 'CASH') {
-            saveAndSendOrder(tempSavedOrderData, '💵 Tiền mặt tại quầy');
+            saveAndSendOrder(tempSavedOrderData, '💵 Tiền mặt tại quầy', null);
         } else {
-            document.getElementById('modal-step-choice').style.display = 'none';
-            document.getElementById('modal-header-title').innerText = "Thanh Toán Hóa Đơn";
-            
+            // 🔥 SIÊU TỰ ĐỘNG: Bỏ qua bước hiện ảnh QR, bấm nút là đi thẳng đến app ngân hàng luôn!
             const description = orderCode;
-            const qrUrl = `https://img.vietqr.io/image/${BANK_CONFIG.bankId}-${BANK_CONFIG.accountNo}-compact.png?amount=${total}&addInfo=${encodeURIComponent(description)}&accountName=${encodeURIComponent(BANK_CONFIG.accountName)}`;
-            const bankAppDeepLink = `https://link.vietqr.io/${BANK_CONFIG.bankId}/${BANK_CONFIG.accountNo}/${total}/${encodeURIComponent(description)}?accountName=${encodeURIComponent(BANK_CONFIG.accountName)}`;
+            const bankAppDeepLink = 'https://link.vietqr.io/' + BANK_CONFIG.bankId + '/' + BANK_CONFIG.accountNo + '/' + total + '/' + encodeURIComponent(description) + '?accountName=' + encodeURIComponent(BANK_CONFIG.accountName);
             
-            document.getElementById('qr-modal-section').innerHTML = `
-                <p style="color: #000; font-weight: bold; font-size: 14px; margin: 0 0 5px 0;">Mã QR Gài Sẵn Số Tiền Hóa Đơn</p>
-                
-                <div style="cursor: pointer;" onclick="moBankVaHoanTatDon('${bankAppDeepLink}')" title="Chạm vào để mở nhanh app ngân hàng">
-                    <img id="qr-image" src="${qrUrl}" alt="Mã QR Techcombank">
-                </div>
-                
-                <div id="qr-info" style="color: #111; font-size: 13px; margin: 10px 0; font-weight: bold; text-align: left; background:#f7fafc; padding:10px; border-radius:6px; border:1px solid #e2e8f0;">
-                    📍 Chủ TK: HKD PHUC AN<br>
-                    💳 Số TK: ${BANK_CONFIG.accountNo}<br>
-                    💰 Số tiền: <span style="color:var(--neon-pink);">${total.toLocaleString()}đ</span><br>
-                    🔠 Nội dung: <span style="color:blue;">${orderCode}</span>
-                </div>
-                
-                <button class="btn" style="background: linear-gradient(45deg, #ff007f, #7928ca); color: #fff; padding: 12px; font-size:14px; box-shadow: 0 0 15px rgba(255, 0, 127, 0.4);" onclick="moBankVaHoanTatDon('${bankAppDeepLink}')">
-                    📲 TỰ ĐỘNG MỞ APP NGÂN HÀNG
-                </button>
-                
-                <p style="font-size: 11.5px; color: #4a5568; margin: 12px 0 0 0; font-weight: bold; line-height: 1.4;">
-                    💡 Chạm vào nút TÍM hoặc HÌNH QR để máy tự mở App Bank điền sẵn tiền.<br>
-                    📢 Sân có loa báo tự động nên đơn hàng sẽ được gửi đi ngay lập tức!
-                </p>
-            `;
-            document.getElementById('qr-modal-section').style.display = 'block';
+            saveAndSendOrder(tempSavedOrderData, '💳 Chuyển khoản VietQR (Tự động mở App Bank)', bankAppDeepLink);
         }
     }
 
-    // MỞ APP BANK VÀ TỰ ĐỘNG NỔ ĐƠN LUÔN KHÔNG CẦN CHỜ
-    function moBankVaHoanTatDon(bankUrl) {
-        window.open(bankUrl, '_blank');
-        if (tempSavedOrderData) {
-            saveAndSendOrder(tempSavedOrderData, '💳 Chuyển khoản VietQR (Đã chuyển - Loa quầy canh)');
-        }
-    }
-
-    // HÀM ĐỒNG BỘ: PHẢI LƯU ĐƯỢC VÀO FIREBASE XONG MỚI HIỆN POPUP MODAL THÀNH CÔNG VÀ TELEGRAM
-    function saveAndSendOrder(order, paymentStr) {
+    // HÀM ĐỒNG BỘ: PHẢI LƯU ĐƯỢC VÀO FIREBASE XONG MỚI HIỆN POPUP MODAL THÀNH CÔNG VÀ KÍCH HOẠT MỞ APP BANK
+    function saveAndSendOrder(order, paymentStr, bankUrl) {
         database.ref('orders_history').push(order)
-        .then(() => {
+        .then(function() {
             console.log("Firebase sync successful!");
             closeCheckoutModal(); // Đóng ô chọn thanh toán trước
             
-            // Biên soạn lời nhắn hiển thị lên popup điện thoại của khách ngoài sân
             let textAlert = "";
             if (order.payment === 'CASH') {
-                textAlert = `📍 Vị trí giao: ${order.court}\n👤 Tên khách hàng: ${order.customer}\n💰 Số tiền cần chuẩn bị: ${order.total.toLocaleString()}đ tiền mặt.\n\nNhân viên Phúc An sẽ mang đồ uống/phụ kiện ra sân ngay cho bạn nhé!`;
+                textAlert = "📍 Vị trí giao: " + order.court + "\n" +
+                            "👤 Tên khách hàng: " + order.customer + "\n" +
+                            "💰 Số tiền cần chuẩn bị: " + order.total.toLocaleString() + "đ tiền mặt.\n\n" +
+                            "Nhân viên Phúc An sẽ mang đồ uống/phụ kiện ra sân ngay cho bạn nhé!";
+                openSuccessModal(textAlert);
             } else {
-                textAlert = `📍 Vị trí giao: ${order.court}\n👤 Tên khách hàng: ${order.customer}\n💰 Trị giá bill: ${order.total.toLocaleString()}đ\n\nHệ thống đã kết nối với LOA THÔNG BÁO TỰ ĐỘNG tại quầy. Nhân viên sẽ mang đồ đến sân cho bạn ngay lập tức!`;
+                textAlert = "📍 Vị trí giao: " + order.court + "\n" +
+                            "👤 Tên khách hàng: " + order.customer + "\n" +
+                            "💰 Trị giá bill: " + order.total.toLocaleString() + "đ\n\n" +
+                            "Hệ thống đang tự động mở App Ngân Hàng của bạn...\n" +
+                            "Loa quầy sẽ thông báo tự động khi bạn chuyển khoản xong!";
+                openSuccessModal(textAlert);
+                
+                // Điều hướng khách đến app ngân hàng điền sẵn tiền
+                if (bankUrl) {
+                    setTimeout(function() {
+                        window.location.href = bankUrl; // Sử dụng href trực tiếp để không bị Safari/Chrome chặn popup điện thoại
+                    }, 300);
+                }
             }
-            openSuccessModal(textAlert);
         })
-        .catch((err) => {
+        .catch(function(err) {
             console.error("Firebase Sync Error Details:", err);
-            alert("❌ Lỗi đồng bộ Firebase: Đơn chưa được ghi nhận! Hãy kiểm tra lại tab Rules của Database.\nChi tiết lỗi: " + err.message);
+            alert("❌ Lỗi đồng bộ Firebase: Đơn chưa được ghi nhận!\nChi tiết lỗi: " + err.message);
         });
 
-        // 🔥 PHẦN SỬA LỖI TELEGRAM KHÔNG BỊ DÍNH KÝ TỰ GẠCH CHÉO LOẠN MÃ
-        let itemsListStr = order.items.map(i => `• ${i.name} (x${i.quantity})`).join('\n');
-        let msg = `🔔 <b>ĐƠN HÀNG MỚI TẠI SÂN</b>\n`;
-        msg += `----------------------------------\n`;
-        msg += `📍 Giao đến: <b>${order.court}</b>\n`;
-        msg += `👤 Tên khách: <b>${order.customer}</b>\n`;
-        msg += `💰 Giá tiền hóa đơn: <b>${order.total.toLocaleString()}đ</b>\n`;
-        msg += `💳 Hình thức: ${paymentStr}\n`;
-        msg += `🔠 Mã nội dung: <b>${order.orderCode}</b>\n`;
-        msg += `📦 <b>Danh sách đồ mua:</b>\n${itemsListStr}`;
+        // Kích hoạt thông báo về Telegram ẩn dưới nền (Sử dụng nối chuỗi an toàn tuyệt đối)
+        let itemsListStr = order.items.map(function(i) { return "• " + i.name + " (x" + i.quantity + ")"; }).join("\n");
+        let msg = "🔔 <b>ĐƠN HÀNG MỚI TẠI SÂN</b>\n" +
+                  "----------------------------------\n" +
+                  "📍 Giao đến: <b>" + order.court + "</b>\n" +
+                  "👤 Tên khách: <b>" + order.customer + "</b>\n" +
+                  "💰 Giá tiền hóa đơn: <b>" + order.total.toLocaleString() + "đ</b>\n" +
+                  "💳 Hình thức: " + paymentStr + "\n" +
+                  "🔠 Mã nội dung: <b>" + order.orderCode + "</b>\n" +
+                  "📦 <b>Danh sách đồ mua:</b>\n" + itemsListStr;
 
-        const url = `https://api.telegram.org/bot${TELEGRAM_CONFIG.token}/sendMessage`;
+        const url = "https://api.telegram.org/bot" + TELEGRAM_CONFIG.token + "/sendMessage";
         fetch(url, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ chat_id: TELEGRAM_CONFIG.chatId, text: msg, parse_mode: "HTML" })
-        }).catch(err => console.error("Lỗi gửi Telegram:", err));
+        }).catch(function(err) { console.error("Lỗi gửi Telegram:", err); });
     }
 
     function finishCheckout() {
@@ -555,7 +523,7 @@
     }
 
     function listenStaffOrders() {
-        database.ref('orders_history').limitToLast(10).on('value', (snapshot) => {
+        database.ref('orders_history').limitToLast(10).on('value', function(snapshot) {
             const data = snapshot.val();
             const box = document.getElementById('staff-orders-list');
             box.innerHTML = '';
@@ -563,13 +531,12 @@
             
             for(let key in data) {
                 let o = data[key];
-                box.innerHTML += `
-                    <div class="order-row">
-                        📍 <b>${o.court} - Khách: ${o.customer}</b> [Mã: ${o.orderCode}]<br>
-                        💰 Bill: <b>${o.total.toLocaleString()}đ</b> (${o.payment === 'CASH' ? 'Tiền mặt' : 'Đã quét QR'})<br>
-                        🕒 Thời gian: ${o.time}
-                    </div>
-                `;
+                let hinhThuc = (o.payment === 'CASH') ? 'Tiền mặt' : 'Đã CK Bank';
+                box.innerHTML += '<div class="order-row">' +
+                                 '📍 <b>' + o.court + ' - Khách: ' + o.customer + '</b> [Mã: ' + o.orderCode + ']<br>' +
+                                 '💰 Bill: <b>' + o.total.toLocaleString() + 'đ</b> (' + hinhThuc + ')<br>' +
+                                 '🕒 Thời gian: ' + o.time +
+                                 '</div>';
             }
         });
     }
