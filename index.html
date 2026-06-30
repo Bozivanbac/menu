@@ -72,15 +72,29 @@
         .btn-admin { background: linear-gradient(45deg, #ff007f, #7928ca); color: #fff; }
         .btn-checkout { background: linear-gradient(45deg, #39ff14, #00ff87); color: #000; font-size: 16px; margin-top: 10px; padding: 12px; }
         
-        /* Nút tăng giảm số lượng trong Giỏ Hàng của Khách */
-        .cart-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px dashed rgba(255,255,255,0.1); }
+        /* Bộ nút tăng giảm số lượng cực kỳ trực quan */
         .btn-qty {
-            background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15);
-            color: #fff; border-radius: 6px; padding: 3px 9px; cursor: pointer; font-size: 13px; font-weight: bold; transition: 0.2s;
+            background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2);
+            color: #fff; border-radius: 6px; padding: 5px 14px; cursor: pointer; font-size: 14px; font-weight: bold; transition: 0.2s;
         }
-        .btn-qty:hover { background: var(--neon-blue); color: #000; border-color: var(--neon-blue); }
-        .btn-qty-del { background: rgba(255, 0, 127, 0.15); border-color: rgba(255, 0, 127, 0.2); color: var(--neon-pink); }
-        .btn-qty-del:hover { background: var(--neon-pink); color: #fff; }
+        .btn-qty:hover { background: var(--neon-blue); color: #000; border-color: var(--neon-blue); box-shadow: 0 0 8px var(--neon-blue); }
+
+        /* GIỎ HÀNG DÀNH CHO BẢN ĐỂ BÀN/MÁY TÍNH QUẦY */
+        .cart-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px dashed rgba(255,255,255,0.1); font-size: 14px; }
+
+        /* 🔥 THANH MUA HÀNG NỔI Ở ĐÁY MÀN HÌNH ĐIỆN THOẠI (STIKY FOOTER) */
+        .mobile-cart-bar {
+            display: none; position: fixed; bottom: 0; left: 0; width: 100%;
+            background: #10141d; border-top: 2px solid var(--neon-blue);
+            padding: 12px 20px; z-index: 999;
+            box-shadow: 0 -5px 25px rgba(0,0,0,0.6);
+            justify-content: space-between; align-items: center;
+        }
+        @media (max-width: 991px) {
+            .mobile-cart-bar { display: flex; }
+            body { padding-bottom: 85px; } /* Đẩy trang lên để không bị khuất chữ dưới đáy */
+            .desktop-cart-panel { display: none; } /* Ẩn giỏ hàng phụ ở máy tính khi xem bằng điện thoại cho gọn */
+        }
 
         /* POPUP MODAL CHÍNH GIỮA MÀN HÌNH */
         .modal-overlay {
@@ -99,10 +113,9 @@
         .btn-modal-close { background: #4a5568; color: white; margin-top: 15px; }
         
         #qr-modal-section { display: none; margin-top: 15px; background: #fff; padding: 18px; border-radius: 12px; color: #000; }
-        #qr-image { max-width: 170px; margin-top: 5px; width: 100%; border: 1px solid #eee; border-radius: 8px; transition: 0.3s; }
-        #qr-image:hover { transform: scale(1.03); box-shadow: 0 0 10px rgba(0,0,0,0.15); }
+        #qr-image { max-width: 170px; margin-top: 5px; width: 100%; border: 1px solid #eee; border-radius: 8px; }
         
-        /* Bảng Khu Vực Ẩn */
+        /* Các bảng quản trị ẩn */
         #admin-panel, #staff-panel { display: none; }
         #admin-panel { border-color: var(--neon-pink); }
         #staff-panel { border-color: var(--neon-green); }
@@ -170,17 +183,28 @@
         </div>
     </div>
 
-    <!-- CỘT PHẢI: GIỎ HÀNG TỔNG QUAN -->
-    <div>
+    <!-- CỘT BÊN: GIỎ HÀNG TỔNG QUAN (CHỈ HIỆN TRÊN MÁY TÍNH) -->
+    <div class="desktop-cart-panel">
         <div class="card">
             <h2>🛒 GIỎ HÀNG CỦA BẠN</h2>
             <div id="cart-content">
                 <p style="color: #718096; text-align: center; font-size: 14px;">Chưa chọn món nào.</p>
             </div>
-            <h3 style="text-align: right; margin: 20px 0 10px 0; color: var(--neon-pink); font-size: 1.4rem;">Tổng: <span id="total-price">0đ</span></h3>
+            <h3 style="text-align: right; margin: 20px 0 10px 0; color: var(--neon-pink); font-size: 1.4rem;">Tổng: <span id="desktop-total-price">0đ</span></h3>
             <button class="btn btn-checkout" onclick="openCheckoutModal()">🛒 MUA HÀNG NGAY</button>
         </div>
     </div>
+</div>
+
+<!-- 🔥 THANH GIỎ HÀNG NỔI ĐÁY MÀN HÌNH (Giao diện Mobile cực tiện) -->
+<div class="mobile-cart-bar" id="mobile-cart-sticky" style="display: none;">
+    <div style="text-align: left;">
+        <span style="font-size: 12px; color: #a0aec0;">🛒 Đã chọn mua:</span>
+        <div style="font-size: 16px; font-weight: bold; color: var(--neon-green);" id="mobile-total-price">0đ</div>
+    </div>
+    <button class="btn" style="width: auto; padding: 10px 18px; background: linear-gradient(45deg, #39ff14, #00ff87);" onclick="openCheckoutModal()">
+        MUA HÀNG NGAY 🚀
+    </button>
 </div>
 
 <!-- POPUP CHÍNH GIỮA MÀN HÌNH -->
@@ -198,9 +222,7 @@
         </div>
 
         <!-- Bước 2: Hiện QR Chết & Deep Link tự mở App Bank -->
-        <div id="qr-modal-section">
-            <!-- Phần này sẽ được điền tự động bằng Javascript phía dưới -->
-        </div>
+        <div id="qr-modal-section"></div>
 
         <button class="btn btn-modal-close" onclick="closeCheckoutModal()">Đóng cửa sổ</button>
     </div>
@@ -252,6 +274,7 @@
         renderProducts();
     });
 
+    // HIỂN THỊ THỰC ĐƠN KÈM NÚT TĂNG GIẢM TRỰC TIẾP TRÊN Ô MÓN ĂN
     function renderProducts() {
         const drinkGrid = document.getElementById('drink-list');
         const accessoryGrid = document.getElementById('accessory-list');
@@ -259,12 +282,32 @@
         let hasDrink = false, hasAccessory = false;
 
         products.forEach(p => {
+            // Kiểm tra xem món này đã nằm trong giỏ hàng chưa và lấy số lượng ra
+            const itemInCart = cart.find(item => item.id === p.id);
+            const qty = itemInCart ? itemInCart.quantity : 0;
+
+            // Xử lý logic hiển thị nút bấm linh hoạt cho điện thoại
+            let actionControlsHTML = '';
+            if (qty > 0) {
+                // Nếu số lượng > 0: Hiện bộ nút tăng giảm trực tiếp trên ô món
+                actionControlsHTML = `
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 5px;">
+                        <button class="btn-qty" onclick="decreaseQuantity('${p.id}')">−</button>
+                        <span style="font-weight: bold; font-size: 15px; min-width: 18px;">${qty}</span>
+                        <button class="btn-qty" onclick="increaseQuantity('${p.id}')">+</button>
+                    </div>
+                `;
+            } else {
+                // Nếu chưa chọn: Hiện nút Thêm vào giỏ cơ bản
+                actionControlsHTML = `<button class="btn" onclick="addToCart('${p.id}')">Thêm vào giỏ</button>`;
+            }
+
             const itemHTML = `
                 <div class="product-item">
                     <button class="btn-delete-p" id="del-${p.id}" onclick="adminDeleteProduct('${p.id}')">❌</button>
                     <div class="p-name">${p.name}</div>
                     <div class="p-price">${p.price.toLocaleString()}đ</div>
-                    <button class="btn" onclick="addToCart('${p.id}')">Thêm vào giỏ</button>
+                    ${actionControlsHTML}
                 </div>
             `;
             if (p.category === 'accessory') { accessoryGrid.innerHTML += itemHTML; hasAccessory = true; }
@@ -311,22 +354,18 @@
         if (confirm("Xác nhận xóa món này?")) database.ref(`menu_products/${productId}`).remove();
     }
 
-    // THAO TÁC GIỎ HÀNG (THÊM, TĂNG, GIẢM, XÓA CHO KHÁCH)
+    // LOGIC ĐIỀU CHỈNH GIỎ HÀNG (Tự động cập nhật song song cả 2 vùng giao diện)
     function addToCart(productId) {
         const product = products.find(p => p.id === productId);
         const itemInCart = cart.find(item => item.id === productId);
-        if (itemInCart) {
-            itemInCart.quantity += 1;
-        } else {
-            cart.push({ ...product, quantity: 1 });
-        }
-        renderCart();
+        if (itemInCart) itemInCart.quantity += 1; else cart.push({ ...product, quantity: 1 });
+        updateCartState();
     }
 
     function increaseQuantity(productId) {
         const item = cart.find(item => item.id === productId);
         if (item) item.quantity += 1;
-        renderCart();
+        updateCartState();
     }
 
     function decreaseQuantity(productId) {
@@ -334,55 +373,47 @@
         if (item) {
             item.quantity -= 1;
             if (item.quantity <= 0) {
-                removeFromCart(productId);
-                return;
+                cart = cart.filter(i => i.id !== productId);
             }
         }
-        renderCart();
+        updateCartState();
     }
 
-    function removeFromCart(productId) {
-        cart = cart.filter(item => item.id !== productId);
-        renderCart();
-    }
-
-    // HIỂN THỊ GIỎ HÀNG CÓ ĐẦY ĐỦ NÚT ĐIỀU CHỈNH SỐ LƯỢNG
-    function renderCart() {
-        const content = document.getElementById('cart-content');
-        const totalSpan = document.getElementById('total-price');
-        if (cart.length === 0) { 
-            content.innerHTML = '<p style="color:#718096;text-align:center;font-size:14px;">Chưa chọn món nào.</p>'; 
-            totalSpan.innerText = '0đ'; 
-            return; 
-        }
+    // Hàm tổng hợp cập nhật tiền và render lại giao diện menu + thanh nổi mobile
+    function updateCartState() {
+        renderCartDesktop();
+        renderProducts(); // Render lại menu để nút đổi thành [-] Số lượng [+] ngay lập tức
         
+        // Tính tổng tiền giỏ hàng hiện tại
+        let total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        
+        // Quản lý ẩn/hiện thanh mua hàng nổi ở đáy điện thoại dựa trên giỏ hàng
+        const mobileBar = document.getElementById('mobile-cart-sticky');
+        if (cart.length > 0) {
+            if (window.innerWidth <= 991) mobileBar.style.display = 'flex';
+            document.getElementById('mobile-total-price').innerText = total.toLocaleString() + 'đ';
+        } else {
+            mobileBar.style.display = 'none';
+        }
+    }
+
+    // Hiển thị danh sách giỏ hàng phụ trên máy tính quầy
+    function renderCartDesktop() {
+        const content = document.getElementById('cart-content');
+        const totalSpan = document.getElementById('desktop-total-price');
+        if (cart.length === 0) { content.innerHTML = '<p style="color:#718096;text-align:center;font-size:14px;">Chưa chọn món nào.</p>'; totalSpan.innerText = '0đ'; return; }
         let html = '', total = 0;
         cart.forEach(item => {
-            let itemTotal = item.price * item.quantity; 
-            total += itemTotal;
-            html += `
-                <div class="cart-item">
-                    <div style="flex: 1; text-align: left; padding-right: 10px;">
-                        <span style="font-size: 14px; font-weight: bold; color: #fff;">${item.name}</span>
-                        <br>
-                        <span style="color: var(--neon-pink); font-size: 13px;">${itemTotal.toLocaleString()}đ</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 6px;">
-                        <button class="btn-qty" onclick="decreaseQuantity('${item.id}')">−</button>
-                        <span style="min-width: 20px; text-align: center; font-weight: bold; font-size: 14px;">${item.quantity}</span>
-                        <button class="btn-qty" onclick="increaseQuantity('${item.id}')">+</button>
-                        <button class="btn-qty btn-qty-del" onclick="removeFromCart('${item.id}')" title="Xóa món này">🗑️</button>
-                    </div>
-                </div>
-            `;
+            let itemTotal = item.price * item.quantity; total += itemTotal;
+            html += `<div class="cart-item"><span>${item.name} <b>x${item.quantity}</b></span><span style="color:var(--neon-blue);">${itemTotal.toLocaleString()}đ</span></div>`;
         });
-        content.innerHTML = html; 
-        totalSpan.innerText = total.toLocaleString() + 'đ';
+        content.innerHTML = html; totalSpan.innerText = total.toLocaleString() + 'đ';
     }
 
+    // BẬT CỬA SỔ CHỌN PHƯƠNG THỨC THANH TOÁN CHÍNH GIỮA MÀN HÌNH
     function openCheckoutModal() {
         const customer = document.getElementById('customer-name').value.trim();
-        if (!customer) return alert("Quý khách vui lòng điền Tên/Số điện thoại để nhân viên biết giao đồ tận sân nhé!");
+        if (!customer) return alert("Quý khách vui lòng điền Tên của mình trước khi mua hàng!");
         if (cart.length === 0) return alert("Giỏ hàng đang trống!");
 
         document.getElementById('modal-header-title').innerText = "Chọn Thanh Toán";
@@ -395,7 +426,7 @@
         document.getElementById('checkout-modal').style.display = 'none';
     }
 
-    // XỬ LÝ KHÁCH CHỌN PHƯƠNG THỨC THANH TOÁN
+    // XỬ LÝ THANH TOÁN
     function processOrder(method) {
         const customer = document.getElementById('customer-name').value.trim();
         const court = document.getElementById('court-number').value;
@@ -422,17 +453,16 @@
             
             const description = orderCode;
             
-            // 1. Link ảnh mã QR hiển thị ra màn hình
+            // Link ảnh mã QR hóa đơn chết giá tiền
             const qrUrl = `https://img.vietqr.io/image/${BANK_CONFIG.bankId}-${BANK_CONFIG.accountNo}-compact.png?amount=${total}&addInfo=${encodeURIComponent(description)}&accountName=${encodeURIComponent(BANK_CONFIG.accountName)}`;
             
-            // 2. Link Deep Link thông minh tự nhận diện thiết bị để tự động mở các App Ngân hàng nội địa dính sẵn số tiền chết
+            // Link Deep Link thông minh tự nhận diện app ngân hàng nội địa của khách dính sẵn số tiền chết
             const bankAppDeepLink = `https://link.vietqr.io/${BANK_CONFIG.bankId}/${BANK_CONFIG.accountNo}/${total}/${encodeURIComponent(description)}?accountName=${encodeURIComponent(BANK_CONFIG.accountName)}`;
             
-            // Đổ cấu trúc giao diện mới vào vùng hiển thị QR
             document.getElementById('qr-modal-section').innerHTML = `
                 <p style="color: #000; font-weight: bold; font-size: 14px; margin: 0 0 5px 0;">Mã QR Gài Sẵn Số Tiền Hóa Đơn</p>
                 
-                <a href="${bankAppDeepLink}" target="_blank" title="Chạm vào đây để mở nhanh app ngân hàng">
+                <a href="${bankAppDeepLink}" target="_blank" title="Chạm vào đây để tự động mở nhanh app ngân hàng trên máy">
                     <img id="qr-image" src="${qrUrl}" alt="Mã QR Techcombank">
                 </a>
                 
@@ -443,14 +473,14 @@
                     🔠 Nội dung: <span style="color:blue;">${orderCode}</span>
                 </div>
                 
-                <!-- NÚT BẤM KÍCH HOẠT MỞ THẲNG APP NGÂN HÀNG CỦA KHÁCH -->
+                <!-- NÚT BẤM SIÊU TỐI ƯU: CHẠM LÀ MỞ LUÔN APP BANK TRÊN ĐIỆN THOẠI KHÁCH -->
                 <a href="${bankAppDeepLink}" target="_blank" style="text-decoration: none; display: block; margin-bottom: 12px;">
                     <button class="btn" style="background: linear-gradient(45deg, #ff007f, #7928ca); color: #fff; padding: 12px; font-size:14px; box-shadow: 0 0 15px rgba(255, 0, 127, 0.4);">
                         📲 TỰ ĐỘNG MỞ APP NGÂN HÀNG
                     </button>
                 </a>
                 
-                <p style="font-size: 11px; color: #718096; margin: 5px 0 10px 0;">(Bấm nút màu tím phía trên để mở thẳng app Bank trên máy của bạn, hoặc dùng máy khác quét hình QR)</p>
+                <p style="font-size: 11px; color: #718096; margin: 5px 0 10px 0;">(Bấm nút màu tím phía trên để máy tự mở app Bank điền sẵn số tiền, hoặc dùng máy khác quét hình QR)</p>
                 <button class="btn btn-checkout" onclick="confirmQRPaid()">🚀 TÔI ĐÃ CHUYỂN KHOẢN XONG</button>
             `;
             
@@ -461,7 +491,7 @@
     function confirmQRPaid() {
         if (tempSavedOrderData) {
             saveAndSendOrder(tempSavedOrderData, '💳 Chuyển khoản qua QR (Khách báo đã chuyển)');
-            alert(`🎉 Đơn hàng đã gửi thành công! Nhân viên sẽ kiểm tra biến động số dư và mang đồ đến ngay ${tempSavedOrderData.court}.`);
+            alert(`🎉 Đơn hàng đã gửi thành công! Nhân viên sẽ kiểm tra tài khoản và mang đồ đến ngay ${tempSavedOrderData.court}.`);
             finishCheckout();
         }
     }
@@ -492,7 +522,7 @@
         tempSavedOrderData = null;
         document.getElementById('customer-name').value = '';
         closeCheckoutModal();
-        renderCart();
+        updateCartState();
     }
 
     function listenStaffOrders() {
