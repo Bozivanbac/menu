@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Phúc An Badminton - Menu Tự Động</title>
-    <!-- Thư viện Firebase -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     
@@ -72,7 +71,7 @@
         .btn-admin { background: linear-gradient(45deg, #ff007f, #7928ca); color: #fff; }
         .btn-checkout { background: linear-gradient(45deg, #39ff14, #00ff87); color: #000; font-size: 16px; margin-top: 10px; padding: 12px; }
         
-        /* Bộ nút tăng giảm số lượng cực kỳ trực quan */
+        /* Bộ nút tăng giảm số lượng trực tiếp trên ô nước */
         .btn-qty {
             background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2);
             color: #fff; border-radius: 6px; padding: 5px 14px; cursor: pointer; font-size: 14px; font-weight: bold; transition: 0.2s;
@@ -82,7 +81,7 @@
         /* GIỎ HÀNG DÀNH CHO BẢN ĐỂ BÀN/MÁY TÍNH QUẦY */
         .cart-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px dashed rgba(255,255,255,0.1); font-size: 14px; }
 
-        /* 🔥 THANH MUA HÀNG NỔI Ở ĐÁY MÀN HÌNH ĐIỆN THOẠI (STIKY FOOTER) */
+        /* THANH MUA HÀNG NỔI Ở ĐÁY MÀN HÌNH ĐIỆN THOẠI (STICKY FOOTER) */
         .mobile-cart-bar {
             display: none; position: fixed; bottom: 0; left: 0; width: 100%;
             background: #10141d; border-top: 2px solid var(--neon-blue);
@@ -92,8 +91,8 @@
         }
         @media (max-width: 991px) {
             .mobile-cart-bar { display: flex; }
-            body { padding-bottom: 85px; } /* Đẩy trang lên để không bị khuất chữ dưới đáy */
-            .desktop-cart-panel { display: none; } /* Ẩn giỏ hàng phụ ở máy tính khi xem bằng điện thoại cho gọn */
+            body { padding-bottom: 85px; } 
+            .desktop-cart-panel { display: none; } 
         }
 
         /* POPUP MODAL CHÍNH GIỮA MÀN HÌNH */
@@ -129,7 +128,6 @@
 
 <div class="container">
     <div>
-        <!-- THÔNG TIN KHÁCH HÀNG -->
         <div class="card">
             <h2>👤 THÔNG TIN ĐẶT MÓN</h2>
             <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 10px;">
@@ -150,7 +148,6 @@
             </div>
         </div>
 
-        <!-- MENU PHÂN CHIA DANH MỤC RIÊNG BIỆT -->
         <div class="card">
             <h2>🏸 MENU GỌI MÓN TỰ ĐỘNG</h2>
             
@@ -161,7 +158,6 @@
             <div class="product-grid" id="accessory-list"></div>
         </div>
 
-        <!-- PANEL ADMIN (MẬT KHẨU MỚI HIỆN) -->
         <div class="card" id="admin-panel">
             <h2>🛠️ HỆ THỐNG QUẢN TRỊ KHO HÀNG</h2>
             <label>Tên mặt hàng mới:</label>
@@ -176,14 +172,12 @@
             <button class="btn btn-admin" onclick="adminAddProduct()">➕ ĐƯA LÊN HỆ THỐNG TRỰC TUYẾN</button>
         </div>
 
-        <!-- BẢNG THEO DÕI ĐƠN DÀNH CHO NHÂN VIÊN QUẦY -->
         <div class="card" id="staff-panel">
             <h2>🚨 BẢNG KIỂM SOÁT ĐƠN HÀNG (NHÂN VIÊN)</h2>
             <div id="staff-orders-list"></div>
         </div>
     </div>
 
-    <!-- CỘT BÊN: GIỎ HÀNG TỔNG QUAN (CHỈ HIỆN TRÊN MÁY TÍNH) -->
     <div class="desktop-cart-panel">
         <div class="card">
             <h2>🛒 GIỎ HÀNG CỦA BẠN</h2>
@@ -196,7 +190,6 @@
     </div>
 </div>
 
-<!-- 🔥 THANH GIỎ HÀNG NỔI ĐÁY MÀN HÌNH (Giao diện Mobile cực tiện) -->
 <div class="mobile-cart-bar" id="mobile-cart-sticky" style="display: none;">
     <div style="text-align: left;">
         <span style="font-size: 12px; color: #a0aec0;">🛒 Đã chọn mua:</span>
@@ -207,12 +200,10 @@
     </button>
 </div>
 
-<!-- POPUP CHÍNH GIỮA MÀN HÌNH -->
 <div class="modal-overlay" id="checkout-modal">
     <div class="modal-box">
         <div class="modal-title" id="modal-header-title">Chọn Thanh Toán</div>
         
-        <!-- Bước 1: Chọn hình thức -->
         <div id="modal-step-choice">
             <p style="font-size: 14px; color: #a0aec0; margin-bottom: 20px;">Vui lòng lựa chọn hình thức thanh toán thuận tiện nhất.</p>
             <div class="modal-btn-group">
@@ -221,14 +212,12 @@
             </div>
         </div>
 
-        <!-- Bước 2: Hiện QR Chết & Deep Link tự mở App Bank -->
         <div id="qr-modal-section"></div>
 
         <button class="btn btn-modal-close" onclick="closeCheckoutModal()">Đóng cửa sổ</button>
     </div>
 </div>
 
-<!-- Nút ngầm mở quyền quản lý -->
 <div class="admin-login-trigger" onclick="triggerAdminLogin()">🔒 Quản lý hệ thống Phúc An</div>
 
 <script>
@@ -274,7 +263,7 @@
         renderProducts();
     });
 
-    // HIỂN THỊ THỰC ĐƠN KÈM NÚT TĂNG GIẢM TRỰC TIẾP TRÊN Ô MÓN ĂN
+    // HIỂN THỊ SẢN PHẨM KÈM CỘNG TRỪ TRỰC TIẾP
     function renderProducts() {
         const drinkGrid = document.getElementById('drink-list');
         const accessoryGrid = document.getElementById('accessory-list');
@@ -282,14 +271,11 @@
         let hasDrink = false, hasAccessory = false;
 
         products.forEach(p => {
-            // Kiểm tra xem món này đã nằm trong giỏ hàng chưa và lấy số lượng ra
             const itemInCart = cart.find(item => item.id === p.id);
             const qty = itemInCart ? itemInCart.quantity : 0;
 
-            // Xử lý logic hiển thị nút bấm linh hoạt cho điện thoại
             let actionControlsHTML = '';
             if (qty > 0) {
-                // Nếu số lượng > 0: Hiện bộ nút tăng giảm trực tiếp trên ô món
                 actionControlsHTML = `
                     <div style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 5px;">
                         <button class="btn-qty" onclick="decreaseQuantity('${p.id}')">−</button>
@@ -298,7 +284,6 @@
                     </div>
                 `;
             } else {
-                // Nếu chưa chọn: Hiện nút Thêm vào giỏ cơ bản
                 actionControlsHTML = `<button class="btn" onclick="addToCart('${p.id}')">Thêm vào giỏ</button>`;
             }
 
@@ -319,7 +304,7 @@
         if(isAdminVerified) document.querySelectorAll('.btn-delete-p').forEach(btn => btn.style.display = 'block');
     }
 
-    // KHÓA MẬT KHẨU PHUCAN2026$
+    // KHÓA MẬT KHẨU PhucAn2026$
     function triggerAdminLogin() {
         let password = prompt("Nhập mã xác thực hệ thống Phúc An Badminton:");
         if (password === "PhucAn2026$") {
@@ -354,7 +339,7 @@
         if (confirm("Xác nhận xóa món này?")) database.ref(`menu_products/${productId}`).remove();
     }
 
-    // LOGIC ĐIỀU CHỈNH GIỎ HÀNG (Tự động cập nhật song song cả 2 vùng giao diện)
+    // LOGIC GIỎ HÀNG NHANH
     function addToCart(productId) {
         const product = products.find(p => p.id === productId);
         const itemInCart = cart.find(item => item.id === productId);
@@ -379,15 +364,10 @@
         updateCartState();
     }
 
-    // Hàm tổng hợp cập nhật tiền và render lại giao diện menu + thanh nổi mobile
     function updateCartState() {
         renderCartDesktop();
-        renderProducts(); // Render lại menu để nút đổi thành [-] Số lượng [+] ngay lập tức
-        
-        // Tính tổng tiền giỏ hàng hiện tại
+        renderProducts();
         let total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-        
-        // Quản lý ẩn/hiện thanh mua hàng nổi ở đáy điện thoại dựa trên giỏ hàng
         const mobileBar = document.getElementById('mobile-cart-sticky');
         if (cart.length > 0) {
             if (window.innerWidth <= 991) mobileBar.style.display = 'flex';
@@ -397,7 +377,6 @@
         }
     }
 
-    // Hiển thị danh sách giỏ hàng phụ trên máy tính quầy
     function renderCartDesktop() {
         const content = document.getElementById('cart-content');
         const totalSpan = document.getElementById('desktop-total-price');
@@ -410,7 +389,6 @@
         content.innerHTML = html; totalSpan.innerText = total.toLocaleString() + 'đ';
     }
 
-    // BẬT CỬA SỔ CHỌN PHƯƠNG THỨC THANH TOÁN CHÍNH GIỮA MÀN HÌNH
     function openCheckoutModal() {
         const customer = document.getElementById('customer-name').value.trim();
         if (!customer) return alert("Quý khách vui lòng điền Tên của mình trước khi mua hàng!");
@@ -426,7 +404,7 @@
         document.getElementById('checkout-modal').style.display = 'none';
     }
 
-    // XỬ LÝ THANH TOÁN
+    // XỬ LÝ ĐẶT HÀNG
     function processOrder(method) {
         const customer = document.getElementById('customer-name').value.trim();
         const court = document.getElementById('court-number').value;
@@ -452,19 +430,16 @@
             document.getElementById('modal-header-title').innerText = "Thanh Toán Hóa Đơn";
             
             const description = orderCode;
-            
-            // Link ảnh mã QR hóa đơn chết giá tiền
             const qrUrl = `https://img.vietqr.io/image/${BANK_CONFIG.bankId}-${BANK_CONFIG.accountNo}-compact.png?amount=${total}&addInfo=${encodeURIComponent(description)}&accountName=${encodeURIComponent(BANK_CONFIG.accountName)}`;
-            
-            // Link Deep Link thông minh tự nhận diện app ngân hàng nội địa của khách dính sẵn số tiền chết
             const bankAppDeepLink = `https://link.vietqr.io/${BANK_CONFIG.bankId}/${BANK_CONFIG.accountNo}/${total}/${encodeURIComponent(description)}?accountName=${encodeURIComponent(BANK_CONFIG.accountName)}`;
             
+            // THAY ĐỔI GIAO DIỆN QR: Chạm vào QR hoặc nút tím là hệ thống kích hoạt tự động hoàn tất luôn
             document.getElementById('qr-modal-section').innerHTML = `
                 <p style="color: #000; font-weight: bold; font-size: 14px; margin: 0 0 5px 0;">Mã QR Gài Sẵn Số Tiền Hóa Đơn</p>
                 
-                <a href="${bankAppDeepLink}" target="_blank" title="Chạm vào đây để tự động mở nhanh app ngân hàng trên máy">
+                <div style="cursor: pointer;" onclick="moBankVaHoanTatDon('${bankAppDeepLink}')" title="Chạm vào để mở nhanh app ngân hàng">
                     <img id="qr-image" src="${qrUrl}" alt="Mã QR Techcombank">
-                </a>
+                </div>
                 
                 <div id="qr-info" style="color: #111; font-size: 13px; margin: 10px 0; font-weight: bold; text-align: left; background:#f7fafc; padding:10px; border-radius:6px; border:1px solid #e2e8f0;">
                     📍 Chủ TK: HKD PHUC AN<br>
@@ -473,25 +448,28 @@
                     🔠 Nội dung: <span style="color:blue;">${orderCode}</span>
                 </div>
                 
-                <!-- NÚT BẤM SIÊU TỐI ƯU: CHẠM LÀ MỞ LUÔN APP BANK TRÊN ĐIỆN THOẠI KHÁCH -->
-                <a href="${bankAppDeepLink}" target="_blank" style="text-decoration: none; display: block; margin-bottom: 12px;">
-                    <button class="btn" style="background: linear-gradient(45deg, #ff007f, #7928ca); color: #fff; padding: 12px; font-size:14px; box-shadow: 0 0 15px rgba(255, 0, 127, 0.4);">
-                        📲 TỰ ĐỘNG MỞ APP NGÂN HÀNG
-                    </button>
-                </a>
+                <button class="btn" style="background: linear-gradient(45deg, #ff007f, #7928ca); color: #fff; padding: 12px; font-size:14px; box-shadow: 0 0 15px rgba(255, 0, 127, 0.4);" onclick="moBankVaHoanTatDon('${bankAppDeepLink}')">
+                    📲 TỰ ĐỘNG MỞ APP NGÂN HÀNG
+                </button>
                 
-                <p style="font-size: 11px; color: #718096; margin: 5px 0 10px 0;">(Bấm nút màu tím phía trên để máy tự mở app Bank điền sẵn số tiền, hoặc dùng máy khác quét hình QR)</p>
-                <button class="btn btn-checkout" onclick="confirmQRPaid()">🚀 TÔI ĐÃ CHUYỂN KHOẢN XONG</button>
+                <p style="font-size: 11.5px; color: #4a5568; margin: 12px 0 0 0; font-weight: bold; line-height: 1.4;">
+                    💡 Chạm vào nút TÍM hoặc HÌNH QR để máy tự mở App Bank điền sẵn tiền.<br>
+                    📢 Sân có loa báo tự động nên đơn hàng sẽ được gửi đi ngay lập tức!
+                </p>
             `;
-            
             document.getElementById('qr-modal-section').style.display = 'block';
         }
     }
 
-    function confirmQRPaid() {
+    // HÀM SIÊU TỰ ĐỘNG: MỞ APP BANK XONG LÀ HOÀN TẤT ĐƠN LUÔN KHÔNG CẦN CHỜ ĐỢI BẤM NÚT KHÁC
+    function moBankVaHoanTatDon(bankUrl) {
+        // 1. Kích hoạt liên kết sâu mở ứng dụng ngân hàng trên điện thoại khách
+        window.open(bankUrl, '_blank');
+        
+        // 2. Bắn đơn hàng đi ngay lập tức không cần khách thao tác thêm
         if (tempSavedOrderData) {
-            saveAndSendOrder(tempSavedOrderData, '💳 Chuyển khoản qua QR (Khách báo đã chuyển)');
-            alert(`🎉 Đơn hàng đã gửi thành công! Nhân viên sẽ kiểm tra tài khoản và mang đồ đến ngay ${tempSavedOrderData.court}.`);
+            saveAndSendOrder(tempSavedOrderData, '💳 Chuyển khoản VietQR (Đã chuyển - Loa quầy canh)');
+            alert(`🎉 Đơn hàng đặt nước của bạn đã gửi thành công!\nHệ thống của quán đã kết nối trực tiếp với LOA THÔNG BÁO TỰ ĐỘNG tại quầy bar. Nhân viên sẽ mang đồ đến tận ${tempSavedOrderData.court} cho bạn.`);
             finishCheckout();
         }
     }
