@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Phúc An Badminton - Menu Tự Động</title>
+    <!-- Thư viện Firebase -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     
@@ -95,7 +96,7 @@
             .desktop-cart-panel { display: none; } 
         }
 
-        /* POPUP MODAL CHÍNH GIỮA MÀN HÌNH */
+        /* POPUP MODAL THANH TOÁN CHÍNH GIỮA MÀN HÌNH */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px);
@@ -114,6 +115,18 @@
         #qr-modal-section { display: none; margin-top: 15px; background: #fff; padding: 18px; border-radius: 12px; color: #000; }
         #qr-image { max-width: 170px; margin-top: 5px; width: 100%; border: 1px solid #eee; border-radius: 8px; }
         
+        /* POPUP THÔNG BÁO HOÀN TẤT ĐƠN (BẤM ĐÂU CŨNG ĐÓNG) */
+        .success-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(5px);
+            display: none; align-items: center; justify-content: center; z-index: 10000;
+        }
+        .success-box {
+            background: #141821; border: 2px solid var(--neon-green);
+            padding: 30px; border-radius: 16px; width: 90%; max-width: 400px;
+            text-align: center; box-shadow: 0 0 25px rgba(57, 255, 20, 0.4);
+        }
+
         /* Các bảng quản trị ẩn */
         #admin-panel, #staff-panel { display: none; }
         #admin-panel { border-color: var(--neon-pink); }
@@ -128,6 +141,7 @@
 
 <div class="container">
     <div>
+        <!-- THÔNG TIN KHÁCH HÀNG -->
         <div class="card">
             <h2>👤 THÔNG TIN ĐẶT MÓN</h2>
             <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 10px;">
@@ -148,6 +162,7 @@
             </div>
         </div>
 
+        <!-- MENU GỌI MÓN PHÂN DANH MỤC -->
         <div class="card">
             <h2>🏸 MENU GỌI MÓN TỰ ĐỘNG</h2>
             
@@ -158,6 +173,7 @@
             <div class="product-grid" id="accessory-list"></div>
         </div>
 
+        <!-- PANEL ADMIN (MẬT KHẨU PhucAn2026$ MỚI HIỆN) -->
         <div class="card" id="admin-panel">
             <h2>🛠️ HỆ THỐNG QUẢN TRỊ KHO HÀNG</h2>
             <label>Tên mặt hàng mới:</label>
@@ -172,12 +188,14 @@
             <button class="btn btn-admin" onclick="adminAddProduct()">➕ ĐƯA LÊN HỆ THỐNG TRỰC TUYẾN</button>
         </div>
 
+        <!-- BẢNG LỊCH SỬ CHO NHÂN VIÊN QUẦY CANH -->
         <div class="card" id="staff-panel">
             <h2>🚨 BẢNG KIỂM SOÁT ĐƠN HÀNG (NHÂN VIÊN)</h2>
             <div id="staff-orders-list"></div>
         </div>
     </div>
 
+    <!-- GIỎ HÀNG PHỤ (CHỈ HIỆN TRÊN MÁY TÍNH) -->
     <div class="desktop-cart-panel">
         <div class="card">
             <h2>🛒 GIỎ HÀNG CỦA BẠN</h2>
@@ -190,6 +208,7 @@
     </div>
 </div>
 
+<!-- THANH GIỎ HÀNG NỔI ĐÁY MÀN HÌNH -->
 <div class="mobile-cart-bar" id="mobile-cart-sticky" style="display: none;">
     <div style="text-align: left;">
         <span style="font-size: 12px; color: #a0aec0;">🛒 Đã chọn mua:</span>
@@ -200,6 +219,7 @@
     </button>
 </div>
 
+<!-- POPUP THANH TOÁN -->
 <div class="modal-overlay" id="checkout-modal">
     <div class="modal-box">
         <div class="modal-title" id="modal-header-title">Chọn Thanh Toán</div>
@@ -213,15 +233,25 @@
         </div>
 
         <div id="qr-modal-section"></div>
-
         <button class="btn btn-modal-close" onclick="closeCheckoutModal()">Đóng cửa sổ</button>
     </div>
 </div>
 
+<!-- GIAO DIỆN POPUP THÀNH CÔNG CHÍNH GIỮA MÀN HÌNH (BẤM RA NGOÀI HOẶC NÚT ĐỀU ĐÓNG ĐƯỢC) -->
+<div class="success-overlay" id="success-modal" onclick="closeSuccessModal()">
+    <div class="success-box" onclick="event.stopPropagation()">
+        <div style="font-size: 3.5rem; margin-bottom: 10px;">🎉</div>
+        <h3 style="color: var(--neon-green); margin-top: 0; text-transform: uppercase; letter-spacing: 1px;">Đặt hàng thành công!</h3>
+        <div id="success-modal-text" style="color: #fff; font-size: 14px; line-height: 1.6; margin-bottom: 20px; text-align: left; background: rgba(0,0,0,0.4); padding: 15px; border-radius: 8px; border-left: 4px solid var(--neon-green); white-space: pre-line;"></div>
+        <button class="btn" style="background: linear-gradient(45deg, #39ff14, #00ff87); color: #000; width: 100%; padding: 12px;" onclick="closeSuccessModal()">XÁC NHẬN OK</button>
+    </div>
+</div>
+
+<!-- Nút ngầm mở quyền quản lý -->
 <div class="admin-login-trigger" onclick="triggerAdminLogin()">🔒 Quản lý hệ thống Phúc An</div>
 
 <script>
-    // ==================== 1. CẤU HÌNH DỮ LIỆU FIREBASE CỦA BẠN ====================
+    // ==================== 1. CẤU HÌNH DỮ LIỆU FIREBASE ĐÃ ĐỒNG BỘ CỦA BẠN ====================
     const firebaseConfig = {
         apiKey: "AIzaSyCc0CLn5AWsQ6qzd9EIRvf4H_Lw6dcZRoM",
         authDomain: "menu-68f29.firebaseapp.com",
@@ -237,8 +267,8 @@
 
     // ==================== 2. CẤU HÌNH BÁO ĐƠN QUA TELEGRAM BOT CỦA BẠN ====================
     const TELEGRAM_CONFIG = {
-        token: "7778945612:AAH...", // <--- BẠN THAY MÃ TOKEN CỦA CON BOT BẠN VÀO ĐÂY
-        chatId: "-100..."          // <--- BẠN THAY ID NHÓM CHAT TELEGRAM CỦA BẠN VÀO ĐÂY
+        token: "8689079359:AAGxxLAX7BiqbMJKnIxcGvVvk9n_Uqd9CfA", 
+        chatId: "8349164896"                                    
     };
 
     // ==================== 3. THÔNG TIN NGÂN HÀNG TECHCOMBANK ĐỒNG BỘ TỪ HÓA ĐƠN ====================
@@ -404,6 +434,17 @@
         document.getElementById('checkout-modal').style.display = 'none';
     }
 
+    // BẬT VÀ TẮT POPUP THÀNH CÔNG THÔNG MINH
+    function openSuccessModal(msg) {
+        document.getElementById('success-modal-text').innerText = msg;
+        document.getElementById('success-modal').style.display = 'flex';
+    }
+
+    function closeSuccessModal() {
+        document.getElementById('success-modal').style.display = 'none';
+        finishCheckout();
+    }
+
     // XỬ LÝ ĐẶT HÀNG
     function processOrder(method) {
         const customer = document.getElementById('customer-name').value.trim();
@@ -423,8 +464,6 @@
 
         if (method === 'CASH') {
             saveAndSendOrder(tempSavedOrderData, '💵 Tiền mặt tại quầy');
-            alert(`🎉 Đơn đặt hàng thành công! Quý khách vui lòng chuẩn bị ${total.toLocaleString()}đ tiền mặt.`);
-            finishCheckout();
         } else {
             document.getElementById('modal-step-choice').style.display = 'none';
             document.getElementById('modal-header-title').innerText = "Thanh Toán Hóa Đơn";
@@ -433,7 +472,6 @@
             const qrUrl = `https://img.vietqr.io/image/${BANK_CONFIG.bankId}-${BANK_CONFIG.accountNo}-compact.png?amount=${total}&addInfo=${encodeURIComponent(description)}&accountName=${encodeURIComponent(BANK_CONFIG.accountName)}`;
             const bankAppDeepLink = `https://link.vietqr.io/${BANK_CONFIG.bankId}/${BANK_CONFIG.accountNo}/${total}/${encodeURIComponent(description)}?accountName=${encodeURIComponent(BANK_CONFIG.accountName)}`;
             
-            // THAY ĐỔI GIAO DIỆN QR: Chạm vào QR hoặc nút tím là hệ thống kích hoạt tự động hoàn tất luôn
             document.getElementById('qr-modal-section').innerHTML = `
                 <p style="color: #000; font-weight: bold; font-size: 14px; margin: 0 0 5px 0;">Mã QR Gài Sẵn Số Tiền Hóa Đơn</p>
                 
@@ -461,22 +499,36 @@
         }
     }
 
-    // HÀM SIÊU TỰ ĐỘNG: MỞ APP BANK XONG LÀ HOÀN TẤT ĐƠN LUÔN KHÔNG CẦN CHỜ ĐỢI BẤM NÚT KHÁC
+    // MỞ APP BANK VÀ TỰ ĐỘNG NỔ ĐƠN LUÔN KHÔNG CẦN CHỜ
     function moBankVaHoanTatDon(bankUrl) {
-        // 1. Kích hoạt liên kết sâu mở ứng dụng ngân hàng trên điện thoại khách
         window.open(bankUrl, '_blank');
-        
-        // 2. Bắn đơn hàng đi ngay lập tức không cần khách thao tác thêm
         if (tempSavedOrderData) {
             saveAndSendOrder(tempSavedOrderData, '💳 Chuyển khoản VietQR (Đã chuyển - Loa quầy canh)');
-            alert(`🎉 Đơn hàng đặt nước của bạn đã gửi thành công!\nHệ thống của quán đã kết nối trực tiếp với LOA THÔNG BÁO TỰ ĐỘNG tại quầy bar. Nhân viên sẽ mang đồ đến tận ${tempSavedOrderData.court} cho bạn.`);
-            finishCheckout();
         }
     }
 
+    // HÀM ĐỒNG BỘ: PHẢI LƯU ĐƯỢC VÀO FIREBASE XONG MỚI HIỆN POPUP MODAL THÀNH CÔNG VÀ TELEGRAM
     function saveAndSendOrder(order, paymentStr) {
-        database.ref('orders_history').push(order);
+        database.ref('orders_history').push(order)
+        .then(() => {
+            console.log("Firebase sync successful!");
+            closeCheckoutModal(); // Đóng ô chọn thanh toán trước
+            
+            // Biên soạn lời nhắn hiển thị lên popup điện thoại của khách ngoài sân
+            let textAlert = "";
+            if (order.payment === 'CASH') {
+                textAlert = `📍 Vị trí giao: ${order.court}\n👤 Tên khách hàng: ${order.customer}\n💰 Số tiền cần chuẩn bị: ${order.total.toLocaleString()}đ tiền mặt.\n\nNhân viên Phúc An sẽ mang đồ uống/phụ kiện ra sân ngay cho bạn nhé!`;
+            } else {
+                textAlert = `📍 Vị trí giao: ${order.court}\n👤 Tên khách hàng: ${order.customer}\n💰 Trị giá bill: ${order.total.toLocaleString()}đ\n\nHệ thống đã kết nối với LOA THÔNG BÁO TỰ ĐỘNG tại quầy. Nhân viên sẽ mang đồ đến sân cho bạn ngay lập tức!`;
+            }
+            openSuccessModal(textAlert);
+        })
+        .catch((err) => {
+            console.error("Firebase Sync Error Details:", err);
+            alert("❌ Lỗi đồng bộ Firebase: Đơn chưa được ghi nhận! Hãy kiểm tra lại tab Rules của Database.\nChi tiết lỗi: " + err.message);
+        });
 
+        // 🔥 PHẦN SỬA LỖI TELEGRAM KHÔNG BỊ DÍNH KÝ TỰ GẠCH CHÉO LOẠN MÃ
         let itemsListStr = order.items.map(i => `• ${i.name} (x${i.quantity})`).join('\n');
         let msg = `🔔 <b>ĐƠN HÀNG MỚI TẠI SÂN</b>\n`;
         msg += `----------------------------------\n`;
@@ -499,7 +551,6 @@
         cart = [];
         tempSavedOrderData = null;
         document.getElementById('customer-name').value = '';
-        closeCheckoutModal();
         updateCartState();
     }
 
