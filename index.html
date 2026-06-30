@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyber Badminton - Hệ Thống Bán Hàng - Phúc An</title>
+    <style>
+        :root {
+            --bg-color: #0a0b10;
+            --card-bg: rgba(20, 24, 33, 0.8);
+            --neon-blue: #00f2fe;
+            --neon-pink: #ff007f;
+            --neon-green: #39ff14;
+            --text-color: #e2e8f0;
+        }
+
+        * { box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; }
+        body { 
+            background: var(--bg-color); 
+            background-image: radial-gradient(circle at 50% 50%, #1a1b2f 0%, #0a0b10 100%);
+            margin: 0; padding: 15px; color: var(--text-color); 
+        }
+        
+        .container { max-width: 1400px; margin: auto; display: grid; grid-template-columns: 1fr; gap: 20px; }
+        @media (min-width: 992px) { .container { grid-template-columns: 1fr 2fr 1fr; } }
+        
+        /* Hiệu ứng kính mờ tương lai */
+        .card { 
+            background: var(--card-bg); 
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px; border-radius: 16px; 
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            margin-bottom: 20px; 
+        }
+        
+        h2 { margin-top: 0; font-size: 1.3rem; color: var(--neon-blue); text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 10px; }
+        
+        /* Form & Input phong cách Cyber */
+        input, select { 
+            width: 100%; padding: 12px; background: rgba(0,0,0,0.5); 
+            border: 1px solid rgba(0, 242, 254, 0.5); border-radius: 8px; 
+            color: #fff; font-size: 15px; margin-bottom: 15px; transition: 0.3s;
+        }
+        input:focus, select:focus { border-color: var(--neon-pink); outline: none; box-shadow: 0 0 10px rgba(255, 0, 127, 0.5); }
+        label { display: block; margin-bottom: 6px; font-size: 13px; color: #a0aec0; }
+        
+        /* Danh sách sản phẩm */
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+        .product-item { 
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); 
+            padding: 12px; border-radius: 12px; text-align: center; transition: all 0.3s; 
+        }
+        .product-item:hover { 
+            transform: translateY(-3px); border-color: var(--neon-blue); 
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.3); 
+        }
+        .p-name { font-weight: bold; font-size: 14px; margin-bottom: 5px; height: 40px; display: flex; align-items: center; justify-content: center; }
+        .p-price { color: var(--neon-pink); font-weight: bold; margin-bottom: 8px; font-size: 15px; }
+        
+        /* Nút bấm tương lai */
+        .btn { 
+            background: linear-gradient(45deg, #00f2fe, #4facfe); color: #000; font-weight: bold;
+            border: none; padding: 10px; border-radius: 8px; cursor: pointer; width: 100%; transition: 0.3s; 
+        }
+        .btn:hover { opacity: 0.9; box-shadow: 0 0 15px var(--neon-blue); }
+        .btn-admin { background: linear-gradient(45deg, #ff007f, #7928ca); color: #fff; }
+        .btn-admin:hover { box-shadow: 0 0 15px var(--neon-pink); }
+        .btn-checkout { background: linear-gradient(45deg, #39ff14, #00ff87); color: #000; font-size: 16px; }
+        
+        /* Giỏ hàng */
+        .cart-item { display: flex; justify-content: space-between; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px dashed rgba(255,255,255,0.1); font-size: 14px; }
+        
+        /* Màn hình thông báo của Nhân Viên */
+        .staff-alert-box { 
+            background: rgba(255, 0, 127, 0.1); border: 1px solid var(--neon-pink); 
+            max-height: 200px; overflow-y: auto; border-radius: 8px; padding: 10px; 
+        }
+        .alert-msg { 
+            background: rgba(0,0,0,0.4); padding: 8px; border-left: 4px solid var(--neon-pink); 
+            margin-bottom: 8px; border-radius: 4px; font-size: 13px; animation: blink 1.5s infinite alternate;
+        }
+        
+        @keyframes blink { 
+            0% { border-left-color: var(--neon-pink); } 
+            100% { border-left-color: var(--neon-blue); } 
+        }
+        
+        #qr-container { text-align: center; margin-top: 15px; display: none; padding: 15px; background: #fff; border-radius: 12px; }
+        #qr-image { max-width: 180px; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+<h1 style="text-align: center; color: var(--neon-blue); text-shadow: 0 0 10px var(--neon-blue); font-size: 1.8rem; margin-bottom: 25px;">⚡ CYBER BADMINTON APP ⚡</h1>
+
+<div class="container">
+    
+    <div>
+        <div class="card" style="border-color: var(--neon-pink);">
+            <h2>🛠️ QUẢN LÝ KHO (ADMIN)</h2>
+            <label>Tên sản phẩm mới:</label>
+            <input type="text" id="admin-p-name" placeholder="Ví dụ: Nước tăng lực Monster...">
+            <label>Giá bán (VNĐ):</label>
+            <input type="number" id="admin-p-price" placeholder="Ví dụ: 30000">
+            <button class="btn btn-admin" onclick="adminAddProduct()">➕ THÊM VÀO KHO</button>
+        </div>
+
+        <div class="card">
+            <h2>👤 KHÁCH ĐẶT SÂN</h2>
+            <label>Tên khách hàng:</label>
+            <input type="text" id="customer-name" placeholder="Nhập tên khách...">
+            <label>Chọn số sân:</label>
+            <select id="court-number">
+                <option value="Sân 1">Sân số 1</option>
+                <option value="Sân 2">Sân số 2</option>
+            </select>
+        </div>
+    </div>
+
+    <div>
+        <div class="card" style="min-height: 500px;">
+            <h2>🏸 DANH SÁCH NƯỚC & PHỤ KIỆN</h2>
+            <div class="product-grid" id="product-list">
+                </div>
+        </div>
+    </div>
+
+    <div>
+        <div class="card" style="border-color: var(--neon-green);">
+            <h2>🚨 MÀN HÌNH NHÂN VIÊN</h2>
+            <div class="staff-alert-box" id="staff-notifications">
+                <p style="color: #718096; font-size: 13px; text-align: center;">Chưa có thông báo đơn hàng mới.</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>🛒 GIỎ HÀNG ĐANG CHỌN</h2>
+            <div id="cart-content">
+                <p style="color: #718096; text-align: center; font-size: 14px;">Trống.</p>
+            </div>
+            <h3 style="text-align: right; margin: 15px 0; color: var(--neon-pink);">Tổng: <span id="total-price">0đ</span></h3>
+            
+            <label>Hình thức thanh toán:</label>
+            <select id="payment-method" onchange="togglePayment()">
+                <option value="CASH">Tiền mặt</option>
+                <option value="QR">Quét mã QR chuyển khoản</option>
+            </select>
+
+            <button class="btn btn-checkout" onclick="processCheckout()">🛒 ĐẶT HÀNG NGAY</button>
+
+            <div id="qr-container">
+                <b style="color: #000;">Quét Mã QR Qua Ngân Hàng</b>
+                <div id="qr-info" style="color: #555; font-size: 12px; margin: 5px 0;"></div>
+                <img id="qr-image" src="" alt="Mã QR">
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // CẤU HÌNH NGÂN HÀNG NHẬN TIỀN CỦA BẠN
+    const BANK_CONFIG = {
+        bankId: "MB",        // Điền ngân hàng của bạn (Ví dụ: MB, Vietcombank, Techcombank, ACB...)
+        accountNo: "0123456789", // Số tài khoản nhận tiền
+        accountName: "NGUYEN VAN A" // Tên chủ tài khoản viết hoa không dấu
+    };
+
+    // Dữ liệu hàng hóa mặc định ban đầu
+    let products = [
+        { id: 1, name: "Nước suối Aquafina", price: 10000 },
+        { id: 2, name: "Nước tăng lực Revive", price: 15000 },
+        { id: 3, name: "Quấn cán vợt VS", price: 20000 },
+        { id: 4, name: "Quả cầu lông lẻ", price: 25000 }
+    ];
+
+    let cart = [];
+
+    // AUDIO GIẢ LẬP TIẾNG KÊU KHI CÓ THÔNG BÁO ĐẾN MÁY NHÂN VIÊN
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playNotificationSound() {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(880, audioCtx.currentTime); // Âm cao nhọn
+        gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.15);
+    }
+
+    // HIỂN THỊ HÀNG HÓA RA MÀN HÌNH
+    function renderProducts() {
+        const grid = document.getElementById('product-list');
+        grid.innerHTML = '';
+        products.forEach(p => {
+            grid.innerHTML += `
+                <div class="product-item">
+                    <div class="p-name">${p.name}</div>
+                    <div class="p-price">${p.price.toLocaleString()}đ</div>
+                    <button class="btn" onclick="addToCart(${p.id})">Thêm vào giỏ</button>
+                </div>
+            `;
+        });
+    }
+
+    // ADMIN THÊM HÀNG MỚI VÀO KHO
+    function adminAddProduct() {
+        const nameInput = document.getElementById('admin-p-name');
+        const priceInput = document.getElementById('admin-p-price');
+        
+        if (!nameInput.value || !priceInput.value) {
+            alert("Vui lòng điền đầy đủ tên và giá hàng hóa!");
+            return;
+        }
+
+        const newProduct = {
+            id: Date.now(),
+            name: nameInput.value,
+            price: parseInt(priceInput.value)
+        };
+
+        products.push(newProduct);
+        renderProducts(); // Cập nhật lại danh sách công khai luôn
+        
+        nameInput.value = '';
+        priceInput.value = '';
+    }
+
+    // KHÁCH BẤM THÊM VÀO GIỎ HÀNG
+    function addToCart(productId) {
+        const product = products.find(p => p.id === productId);
+        const itemInCart = cart.find(item => item.id === productId);
+
+        if (itemInCart) {
+            itemInCart.quantity += 1;
+        } else {
+            cart.push({ ...product, quantity: 1 });
+        }
+        renderCart();
+    }
+
+    // CẬP NHẬT GIỎ HÀNG
+    function renderCart() {
+        const content = document.getElementById('cart-content');
+        const totalSpan = document.getElementById('total-price');
+        
+        if (cart.length === 0) {
+            content.innerHTML = '<p style="color: #718096; text-align: center; font-size: 14px;">Trống.</p>';
+            totalSpan.innerText = '0đ';
+            return;
+        }
+
+        let html = '';
+        let total = 0;
+        
+        cart.forEach(item => {
+            let itemTotal = item.price * item.quantity;
+            total += itemTotal;
+            html += `
+                <div class="cart-item">
+                    <span>${item.name} <b>x${item.quantity}</b></span>
+                    <span style="color: var(--neon-blue);">${itemTotal.toLocaleString()}đ</span>
+                </div>
+            `;
+        });
+
+        content.innerHTML = html;
+        totalSpan.innerText = total.toLocaleString() + 'đ';
+        
+        // Cập nhật lại ảnh QR nếu đang chọn chế độ QR công khai
+        if(document.getElementById('payment-method').value === 'QR') {
+            generateQR(total);
+        }
+    }
+
+    // ẨN HIỆN QR THEO PHƯƠNG THỨC THANH TOÁN
+    function togglePayment() {
+        const method = document.getElementById('payment-method').value;
+        const qrContainer = document.getElementById('qr-container');
+        if (method === 'QR' && cart.length > 0) {
+            let total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            generateQR(total);
+        } else {
+            qrContainer.style.display = 'none';
+        }
+    }
+
+    // TẠO MÃ QR TỰ ĐỘNG (Dùng API VietQR)
+    function generateQR(amount) {
+        const court = document.getElementById('court-number').value;
+        const customer = document.getElementById('customer-name').value || "Khach Le";
+        const description = `Tien nuoc ${court} ${customer}`.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d"); // Xóa dấu tiếng Việt
+        
+        const qrUrl = `https://img.vietqr.io/image/${BANK_CONFIG.bankId}-${BANK_CONFIG.accountNo}-compact.png?amount=${amount}&addInfo=${encodeURIComponent(description)}&accountName=${encodeURIComponent(BANK_CONFIG.accountName)}`;
+        
+        document.getElementById('qr-image').src = qrUrl;
+        document.getElementById('qr-info').innerText = `STK: ${BANK_CONFIG.accountNo} - Số tiền: ${amount.toLocaleString()}đ`;
+        document.getElementById('qr-container').style.display = 'block';
+    }
+
+    // KHÁCH BẤM ĐẶT HÀNG -> BẮN THÔNG BÁO CHO NHÂN VIÊN
+    function processCheckout() {
+        const customer = document.getElementById('customer-name').value.trim();
+        const court = document.getElementById('court-number').value;
+        const method = document.getElementById('payment-method').value;
+
+        if (!customer) {
+            alert("Vui lòng nhập Tên Khách Hàng trước khi đặt!");
+            return;
+        }
+        if (cart.length === 0) {
+            alert("Giỏ hàng của bạn đang trống!");
+            return;
+        }
+
+        let total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        let itemsListStr = cart.map(i => `${i.name} (x${i.quantity})`).join(', ');
+
+        // Gửi nội dung này sang màn hình thông báo của nhân viên
+        const notifyBox = document.getElementById('staff-notifications');
+        
+        // Xóa dòng thông báo trống ban đầu nếu có
+        if(notifyBox.innerText.includes("Chưa có thông báo")) {
+            notifyBox.innerHTML = '';
+        }
+
+        const now = new Date();
+        const timeStr = `${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
+
+        const newAlert = document.createElement('div');
+        newAlert.className = 'alert-msg';
+        newAlert.innerHTML = `
+            <b>🔔 [${timeStr}] - KHO VỪA CÓ ĐƠN!</b><br>
+            📍 <b>${court}</b> - Khách: <b>${customer}</b><br>
+            📦 Món: ${itemsListStr}<br>
+            💰 Tổng: <span style="color:var(--neon-green)">${total.toLocaleString()}đ</span> (${method === 'CASH' ? 'Tiền mặt' : 'Đã Quét QR'})
+        `;
+
+        // Chèn thông báo mới nhất lên đầu danh sách nhân viên nhìn thấy liền
+        notifyBox.insertBefore(newAlert, notifyBox.firstChild);
+
+        // Kêu âm thanh "Ting Ting" thông báo cho nhân viên tập trung điện thoại/máy tính
+        playNotificationSound();
+
+        // Xóa sạch giỏ hàng hiện tại sau khi đã mua xong
+        alert(`🎉 Đơn hàng của ${customer} (${court}) đã được gửi đến thiết bị nhân viên xử lý!`);
+        cart = [];
+        document.getElementById('customer-name').value = '';
+        document.getElementById('qr-container').style.display = 'none';
+        renderCart();
+    }
+
+    // Chạy render lúc khởi tạo ứng dụng
+    renderProducts();
+</script>
+</body>
+</html>
