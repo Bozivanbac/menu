@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Phúc An Badminton - Menu Tự Động</title>
+    <!-- Thư viện Firebase -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     
@@ -139,6 +140,7 @@
 
 <div class="container">
     <div>
+        <!-- THÔNG TIN KHÁCH HÀNG -->
         <div class="card">
             <h2>👤 THÔNG TIN ĐẶT MÓN</h2>
             <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 10px;">
@@ -159,6 +161,7 @@
             </div>
         </div>
 
+        <!-- MENU GỌI MÓN PHÂN DANH MỤC -->
         <div class="card">
             <h2>🏸 MENU GỌI MÓN TỰ ĐỘNG</h2>
             
@@ -169,6 +172,7 @@
             <div class="product-grid" id="accessory-list"></div>
         </div>
 
+        <!-- PANEL ADMIN (MẬT KHẨU PhucAn2026$ MỚI HIỆN) -->
         <div class="card" id="admin-panel">
             <h2>🛠️ HỆ THỐNG QUẢN TRỊ KHO HÀNG</h2>
             <label>Tên mặt hàng mới:</label>
@@ -183,12 +187,14 @@
             <button class="btn btn-admin" onclick="adminAddProduct()">➕ ĐƯA LÊN HỆ THỐNG TRỰC TUYẾN</button>
         </div>
 
+        <!-- BẢNG LỊCH SỬ CHO NHÂN VIÊN QUẦY CANH -->
         <div class="card" id="staff-panel">
             <h2>🚨 BẢNG KIỂM SOÁT ĐƠN HÀNG (NHÂN VIÊN)</h2>
             <div id="staff-orders-list"></div>
         </div>
     </div>
 
+    <!-- GIỎ HÀNG PHỤ (CHỈ HIỆN TRÊN MÁY TÍNH) -->
     <div class="desktop-cart-panel">
         <div class="card">
             <h2>🛒 GIỎ HÀNG CỦA BẠN</h2>
@@ -201,6 +207,7 @@
     </div>
 </div>
 
+<!-- THANH GIỎ HÀNG NỔI ĐÁY MÀN HÌNH -->
 <div class="mobile-cart-bar" id="mobile-cart-sticky" style="display: none;">
     <div style="text-align: left;">
         <span style="font-size: 12px; color: #a0aec0;">🛒 Đã chọn mua:</span>
@@ -211,6 +218,7 @@
     </button>
 </div>
 
+<!-- POPUP THANH TOÁN -->
 <div class="modal-overlay" id="checkout-modal">
     <div class="modal-box">
         <div class="modal-title" id="modal-header-title">Chọn Thanh Toán</div>
@@ -228,6 +236,7 @@
     </div>
 </div>
 
+<!-- GIAO DIỆN POPUP THÀNH CÔNG CHÍNH GIỮA MÀN HÌNH (BẤM RA NGOÀI HOẶC NÚT ĐỀU ĐÓNG ĐƯỢC) -->
 <div class="success-overlay" id="success-modal" onclick="closeSuccessModal()">
     <div class="success-box" onclick="event.stopPropagation()">
         <div style="font-size: 3.5rem; margin-bottom: 10px;">🎉</div>
@@ -237,6 +246,7 @@
     </div>
 </div>
 
+<!-- Nút ngầm mở quyền quản lý -->
 <div class="admin-login-trigger" onclick="triggerAdminLogin()">🔒 Quản lý hệ thống Phúc An</div>
 
 <script>
@@ -453,9 +463,9 @@
         if (method === 'CASH') {
             saveAndSendOrder(tempSavedOrderData, '💵 Tiền mặt tại quầy', null);
         } else {
-            // 🔥 SIÊU TỰ ĐỘNG: Bỏ qua bước hiện ảnh QR, bấm nút là đi thẳng đến app ngân hàng luôn!
+            // 🔥 ĐÃ SỬA: Đường link dịch dịch app ngân hàng chính thức và ổn định của VietQR
             const description = orderCode;
-            const bankAppDeepLink = 'https://link.vietqr.io/' + BANK_CONFIG.bankId + '/' + BANK_CONFIG.accountNo + '/' + total + '/' + encodeURIComponent(description) + '?accountName=' + encodeURIComponent(BANK_CONFIG.accountName);
+            const bankAppDeepLink = 'https://dl.vietqr.io/translate?bankId=' + BANK_CONFIG.bankId + '&accountNo=' + BANK_CONFIG.accountNo + '&amount=' + total + '&info=' + encodeURIComponent(description);
             
             saveAndSendOrder(tempSavedOrderData, '💳 Chuyển khoản VietQR (Tự động mở App Bank)', bankAppDeepLink);
         }
@@ -479,14 +489,14 @@
                 textAlert = "📍 Vị trí giao: " + order.court + "\n" +
                             "👤 Tên khách hàng: " + order.customer + "\n" +
                             "💰 Trị giá bill: " + order.total.toLocaleString() + "đ\n\n" +
-                            "Hệ thống đang tự động mở App Ngân Hàng của bạn...\n" +
+                            "Hệ thống đang tự động kết nối mở App Ngân Hàng của bạn...\n" +
                             "Loa quầy sẽ thông báo tự động khi bạn chuyển khoản xong!";
                 openSuccessModal(textAlert);
                 
-                // Điều hướng khách đến app ngân hàng điền sẵn tiền
+                // Mở ứng dụng ngân hàng bằng liên kết sâu chuẩn
                 if (bankUrl) {
                     setTimeout(function() {
-                        window.location.href = bankUrl; // Sử dụng href trực tiếp để không bị Safari/Chrome chặn popup điện thoại
+                        window.location.href = bankUrl; // Sử dụng href trực tiếp chống lỗi Safari/Chrome chặn popup
                     }, 300);
                 }
             }
@@ -496,7 +506,7 @@
             alert("❌ Lỗi đồng bộ Firebase: Đơn chưa được ghi nhận!\nChi tiết lỗi: " + err.message);
         });
 
-        // Kích hoạt thông báo về Telegram ẩn dưới nền (Sử dụng nối chuỗi an toàn tuyệt đối)
+        // Kích hoạt thông báo về Telegram ẩn dưới nền
         let itemsListStr = order.items.map(function(i) { return "• " + i.name + " (x" + i.quantity + ")"; }).join("\n");
         let msg = "🔔 <b>ĐƠN HÀNG MỚI TẠI SÂN</b>\n" +
                   "----------------------------------\n" +
