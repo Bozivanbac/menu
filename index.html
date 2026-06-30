@@ -71,7 +71,7 @@
         .btn-admin { background: linear-gradient(45deg, #ff007f, #7928ca); color: #fff; }
         .btn-checkout { background: linear-gradient(45deg, #39ff14, #00ff87); color: #000; font-size: 16px; margin-top: 10px; padding: 12px; }
         
-        /* Bộ nút tăng giảm số lượng trực tiếp trên ô nước */
+        /* Bộ nút tăng giảm số lượng */
         .btn-qty {
             background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2);
             color: #fff; border-radius: 6px; padding: 5px 14px; cursor: pointer; font-size: 14px; font-weight: bold; transition: 0.2s;
@@ -81,7 +81,7 @@
         /* GIỎ HÀNG DÀNH CHO BẢN ĐỂ BÀN/MÁY TÍNH QUẦY */
         .cart-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px dashed rgba(255,255,255,0.1); font-size: 14px; }
 
-        /* THANH MUA HÀNG NỔI Ở ĐÁY MÀN HÌNH ĐIỆN THOẠI (STICKY FOOTER) */
+        /* THANH MUA HÀNG NỔI Ở ĐÁY MÀN HÌNH ĐIỆN THOẠI */
         .mobile-cart-bar {
             display: none; position: fixed; bottom: 0; left: 0; width: 100%;
             background: #10141d; border-top: 2px solid var(--neon-blue);
@@ -95,7 +95,7 @@
             .desktop-cart-panel { display: none; } 
         }
 
-        /* POPUP MODAL THANH TOÁN CHÍNH GIỮA MÀN HÌNH */
+        /* POPUP MODAL CHÍNH GIỮA MÀN HÌNH */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px);
@@ -111,9 +111,7 @@
         .modal-btn-group { display: flex; gap: 10px; margin-top: 15px; }
         .btn-modal-close { background: #4a5568; color: white; margin-top: 15px; }
         
-        #qr-modal-section { display: none; margin-top: 15px; background: #fff; padding: 18px; border-radius: 12px; color: #000; }
-        
-        /* POPUP THÔNG BÁO HOÀN TẤT ĐƠN TIỀN MẶT */
+        /* POPUP THÔNG BÁO HOÀN TẤT ĐƠN (BẤM ĐÂU CŨNG ĐÓNG) */
         .success-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(5px);
@@ -125,12 +123,12 @@
             text-align: center; box-shadow: 0 0 25px rgba(57, 255, 20, 0.4);
         }
 
-        /* Các bảng quản trị ẩn */
-        #admin-panel, #staff-panel { display: none; }
+        /* 🔥 HỆ THỐNG QUẢN TRỊ ẨN ĐỘC QUYỀN ADMIN */
+        #admin-panel, #admin-history-panel { display: none; }
         #admin-panel { border-color: var(--neon-pink); }
-        #staff-panel { border-color: var(--neon-green); }
+        #admin-history-panel { border-color: var(--neon-green); }
         .admin-login-trigger { text-align: center; margin-top: 40px; font-size: 12px; color: #2d3748; cursor: pointer; }
-        .order-row { background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid var(--neon-green); font-size: 13px; text-align: left;}
+        .order-row { background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid var(--neon-green); font-size: 13px; text-align: left; line-height: 1.5;}
     </style>
 </head>
 <body>
@@ -183,9 +181,9 @@
             <button class="btn btn-admin" onclick="adminAddProduct()">➕ ĐƯA LÊN HỆ THỐNG TRỰC TUYẾN</button>
         </div>
 
-        <div class="card" id="staff-panel">
-            <h2>🚨 BẢNG KIỂM SOÁT ĐƠN HÀNG (NHÂN VIÊN)</h2>
-            <div id="staff-orders-list"></div>
+        <div class="card" id="admin-history-panel">
+            <h2>🚨 LỊCH SỬ ĐƠN HÀNG HỆ THỐNG (LƯU 10 NGÀY)</h2>
+            <div id="admin-orders-list"></div>
         </div>
     </div>
 
@@ -216,15 +214,12 @@
         <div class="modal-title" id="modal-header-title">Chọn Thanh Toán</div>
         
         <div id="modal-step-choice">
-            <p style="font-size: 14px; color: #a0aec0; margin-bottom: 20px;">Vui lòng lựa chọn hình thức thanh toán thuận tiện nhất.</p>
+            <p style="font-size: 14px; color: #a0aec0; margin-bottom: 20px;">Vui lòng lựa chọn hình thức thanh toán thuận tiện nhất để báo về quầy trực.</p>
             <div class="modal-btn-group">
                 <button class="btn" style="background: linear-gradient(45deg, #ff9900, #ff5500);" onclick="processOrder('CASH')">💵 TIỀN MẶT</button>
-                <button class="btn" style="background: linear-gradient(45deg, #00f2fe, #4facfe);" onclick="processOrder('QR')">💳 CHUYỂN KHOẢN</button>
+                <button class="btn" style="background: linear-gradient(45deg, #00f2fe, #4facfe);" onclick="processOrder('TRANSFER')">💳 CHUYỂN KHOẢN</button>
             </div>
         </div>
-
-        <div id="qr-modal-section"></div>
-        
         <button class="btn btn-modal-close" onclick="closeCheckoutModal()">Đóng cửa sổ</button>
     </div>
 </div>
@@ -241,7 +236,7 @@
 <div class="admin-login-trigger" onclick="triggerAdminLogin()">🔒 Quản lý hệ thống Phúc An</div>
 
 <script>
-    // ==================== 1. CẤU HÌNH DỮ LIỆU FIREBASE ĐÃ ĐỒNG BỘ CỦA BẠN ====================
+    // ==================== 1. CẤU HÌNH DỮ LIỆU FIREBASE CỦA BẠN ====================
     const firebaseConfig = {
         apiKey: "AIzaSyCc0CLn5AWsQ6qzd9EIRvf4H_Lw6dcZRoM",
         authDomain: "menu-68f29.firebaseapp.com",
@@ -261,17 +256,9 @@
         chatId: "8349164896"                                    
     };
 
-    // ==================== 3. THÔNG TIN NGÂN HÀNG TECHCOMBANK ĐỒNG BỘ TỪ HÓA ĐƠN ====================
-    const BANK_CONFIG = {
-        bankId: "TCB",
-        accountNo: "666688887892",
-        accountName: "HKD PHUC AN"
-    };
-
     let products = [];
     let cart = [];
     let isAdminVerified = false;
-    let tempSavedOrderData = null;
 
     // ĐỒNG BỘ THỰC ĐƠN TỪ FIREBASE REALTIME
     database.ref('menu_products').on('value', function(snapshot) {
@@ -323,16 +310,17 @@
         if(isAdminVerified) document.querySelectorAll('.btn-delete-p').forEach(btn => btn.style.display = 'block');
     }
 
-    // KHÓA MẬT KHẨU PhucAn2026$
+    // KHÓA XÁC THỰC MẬT KHẨU ADMIN PhucAn2026$
     function triggerAdminLogin() {
         let password = prompt("Nhập mã xác thực hệ thống Phúc An Badminton:");
         if (password === "PhucAn2026$") {
             isAdminVerified = true;
-            alert("🔓 Đã mở quyền quản trị kho hàng thành công!");
+            alert("🔓 Đã xác thực quyền Admin! Đã hiển thị kho hàng và Lịch sử ẩn.");
             document.getElementById('admin-panel').style.display = 'block';
-            document.getElementById('staff-panel').style.display = 'block';
+            document.getElementById('admin-history-panel').style.display = 'block';
             document.querySelectorAll('.btn-delete-p').forEach(btn => btn.style.display = 'block');
-            listenStaffOrders();
+            cleanOldOrders();   // Thực hiện quét dọn tự động đơn quá 10 ngày khi admin đăng nhập
+            listenAdminOrders(); // Bật tính năng theo dõi lịch sử
         } else {
             alert("❌ Sai mật khẩu hệ thống!");
         }
@@ -410,11 +398,10 @@
 
     function openCheckoutModal() {
         const customer = document.getElementById('customer-name').value.trim();
-        if (!customer) return alert("Quý khách vui lòng điền Tên của mình trước khi mua hàng!");
+        if (!customer) return alert("Quý khách vui lòng điền Tên của mình trước khi đặt món!");
         if (cart.length === 0) return alert("Giỏ hàng đang trống!");
 
         document.getElementById('modal-header-title').innerText = "Chọn Thanh Toán";
-        document.getElementById('qr-modal-section').style.display = 'none';
         document.getElementById('modal-step-choice').style.display = 'block';
         document.getElementById('checkout-modal').style.display = 'flex';
     }
@@ -423,7 +410,6 @@
         document.getElementById('checkout-modal').style.display = 'none';
     }
 
-    // BẬT VÀ TẮT POPUP THÀNH CÔNG TIỀN MẶT
     function openSuccessModal(msg) {
         document.getElementById('success-modal-text').innerText = msg;
         document.getElementById('success-modal').style.display = 'flex';
@@ -434,96 +420,51 @@
         finishCheckout();
     }
 
-    // XỬ LÝ ĐẶT HÀNG
+    // XỬ LÝ ĐẶT HÀNG RÚT GỌN TỐI ƯU
     function processOrder(method) {
         const customer = document.getElementById('customer-name').value.trim();
         const court = document.getElementById('court-number').value;
         let total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
         const orderCode = "PA" + Math.floor(1000 + Math.random() * 9000); 
 
-        tempSavedOrderData = {
+        // Đính kèm trường timestamp (Mili-giây hiện tại) để phục vụ cho việc tự động xóa sau 10 ngày
+        const orderData = {
             orderCode: orderCode,
             customer: customer,
             court: court,
             total: total,
             payment: method,
             items: cart.slice(),
-            time: new Date().toLocaleString()
+            time: new Date().toLocaleString(),
+            timestamp: Date.now() 
         };
 
-        if (method === 'CASH') {
-            saveAndSendOrder(tempSavedOrderData, '💵 Tiền mặt tại quầy', null);
-        } else {
-            const description = orderCode;
-            
-            // 🔥 GIẢI PHÁP AN TOÀN TUYỆT ĐỐI CHỐNG SẬP TRÌNH DUYỆT:
-            // Tải ảnh QR cực kỳ nhanh từ img.vietqr.io (Không bao giờ lỗi DNS hoặc sập máy chủ như các link dịch sâu)
-            const qrUrl = 'https://img.vietqr.io/image/' + BANK_CONFIG.bankId + '-' + BANK_CONFIG.accountNo + '-compact.png?amount=' + total + '&addInfo=' + encodeURIComponent(description) + '&accountName=' + encodeURIComponent(BANK_CONFIG.accountName);
-            
-            // Link liên kết sâu (deep-link) để kích hoạt mở app ngân hàng khi chạm vào
-            const bankAppDeepLink = 'https://dl.vietqr.io/translate?bankId=' + BANK_CONFIG.bankId + '&accountNo=' + BANK_CONFIG.accountNo + '&amount=' + total + '&info=' + encodeURIComponent(description);
-            
-            // 1. Âm thầm gửi đơn lên Firebase và Telegram lập tức (Đảm bảo quầy nhận được đơn luôn, không lo mất mạng)
-            saveAndSendOrder(tempSavedOrderData, '💳 Chuyển khoản VietQR', bankAppDeepLink);
-            
-            // 2. Thay đổi nội dung Popup sang hiển thị QR Code và nút thông minh, bảo vệ trang web nguyên vẹn
-            document.getElementById('modal-step-choice').style.display = 'none';
-            document.getElementById('modal-header-title').innerText = "Thanh Toán Hóa Đơn";
-            
-            document.getElementById('qr-modal-section').innerHTML = 
-                '<p style="color: #000; font-weight: bold; font-size: 14px; margin: 0 0 5px 0;">Mã QR Tự Động Điền Số Tiền</p>' +
-                '<div style="cursor: pointer; margin: 10px 0;" onclick="window.location.href=\'' + bankAppDeepLink + '\'">' +
-                    '<img id="qr-image" src="' + qrUrl + '" alt="Mã QR Techcombank" style="max-width: 170px; margin-top: 5px; width: 100%; border: 1px solid #eee; border-radius: 8px;">' +
-                '</div>' +
-                '<div id="qr-info" style="color: #111; font-size: 13px; margin: 10px 0; font-weight: bold; text-align: left; background:#f7fafc; padding:10px; border-radius:6px; border:1px solid #e2e8f0;">' +
-                    '📍 Chủ TK: HKD PHUC AN<br>' +
-                    '💳 Số TK: ' + BANK_CONFIG.accountNo + '<br>' +
-                    '💰 Số tiền: <span style="color:var(--neon-pink);">' + total.toLocaleString() + 'đ</span><br>' +
-                    '🔠 Nội dung CK: <span style="color:blue;">' + orderCode + '</span>' +
-                '</div>' +
-                '<button class="btn" style="background: linear-gradient(45deg, #ff007f, #7928ca); color: #fff; padding: 12px; font-size:14px; box-shadow: 0 0 15px rgba(255, 0, 127, 0.4);" onclick="window.location.href=\'' + bankAppDeepLink + '\'">' +
-                    '📲 TỰ ĐỘNG MỞ APP NGÂN HÀNG' +
-                '</button>' +
-                '<p style="font-size: 11.5px; color: #4a5568; margin: 12px 0 0 0; font-weight: bold; line-height: 1.4; text-align: left;">' +
-                    '📢 Đơn hàng của bạn <b>ĐÃ ĐƯỢC GỬI VÀO QUẦY</b>!<br>' +
-                    '💡 Khách chạm nút TÍM để mở thẳng App Bank, hoặc chụp ảnh mã QR ở trên để thực hiện thanh toán nhanh.' +
-                '</p>';
-            
-            document.getElementById('qr-modal-section').style.display = 'block';
-            
-            // Xóa sạch giỏ hàng ở Client ngay để tránh việc khách nhấn đặt trùng 2 lần
-            finishCheckout();
-        }
+        const paymentStr = (method === 'CASH') ? '💵 Tiền mặt tại quầy' : '💳 Chuyển khoản ngân hàng';
+        saveAndSendOrder(orderData, paymentStr);
     }
 
-    // HÀM ĐỒNG BỘ NỀN: PHẢI LƯU ĐƯỢC VÀO FIREBASE XONG MỚI TIẾP TỤC XỬ LÝ
-    function saveAndSendOrder(order, paymentStr, bankUrl) {
+    // LƯU ĐƠN VÀ PHÁT TIN THÔNG BÁO
+    function saveAndSendOrder(order, paymentStr) {
         database.ref('orders_history').push(order)
         .then(function() {
-            console.log("Firebase sync successful!");
-            if (order.payment === 'CASH') {
-                closeCheckoutModal();
-                let textAlert = "📍 Vị trí giao: " + order.court + "\n" +
-                                "👤 Tên khách hàng: " + order.customer + "\n" +
-                                "💰 Số tiền cần chuẩn bị: " + order.total.toLocaleString() + "đ tiền mặt.\n\n" +
-                                "Nhân viên Phúc An sẽ mang đồ uống/phụ kiện ra sân ngay cho bạn nhé!";
-                openSuccessModal(textAlert);
-            } else {
-                console.log("Đơn hàng chuyển khoản đã nổ trên Firebase dưới nền.");
-                // Tự động mở app bank sau khi dữ liệu đã ghi nhận an toàn (phòng hờ thiết bị hỗ trợ mượt mà)
-                if (bankUrl) {
-                    setTimeout(function() {
-                        window.location.href = bankUrl;
-                    }, 250);
-                }
-            }
+            console.log("Firebase save successful!");
+            closeCheckoutModal();
+            
+            let textAlert = "📍 Vị trí nhận: " + order.court + "\n" +
+                        "👤 Khách hàng: " + order.customer + "\n" +
+                        "💰 Trị giá bill: " + order.total.toLocaleString() + "đ\n" +
+                        "💳 Hình thức: " + (order.payment === 'CASH' ? 'Tiền mặt' : 'Chuyển khoản') + "\n\n" +
+                        "Đơn hàng của bạn đã gửi thành công báo cho nhân viên trực quầy. Đồ ăn/thức uống sẽ được giao đến sân ngay lập tức!";
+            openSuccessModal(textAlert);
+            
+            // Kích hoạt dọn dẹp đơn cũ ngầm
+            cleanOldOrders();
         })
         .catch(function(err) {
-            console.error("Firebase Sync Error Details:", err);
-            alert("❌ Lỗi đồng bộ Firebase: Đơn chưa được ghi nhận!\nChi tiết lỗi: " + err.message);
+            alert("❌ Lỗi gửi đơn hàng lên hệ thống: " + err.message);
         });
 
-        // Kích hoạt thông báo về Telegram ẩn dưới nền
+        // Phát tin báo về nhóm/kênh Telegram Admin
         let itemsListStr = order.items.map(function(i) { return "• " + i.name + " (x" + i.quantity + ")"; }).join("\n");
         let msg = "🔔 <b>ĐƠN HÀNG MỚI TẠI SÂN</b>\n" +
                   "----------------------------------\n" +
@@ -531,15 +472,29 @@
                   "👤 Tên khách: <b>" + order.customer + "</b>\n" +
                   "💰 Giá tiền hóa đơn: <b>" + order.total.toLocaleString() + "đ</b>\n" +
                   "💳 Hình thức: " + paymentStr + "\n" +
-                  "🔠 Mã nội dung: <b>" + order.orderCode + "</b>\n" +
-                  "📦 <b>Danh sách đồ mua:</b>\n" + itemsListStr;
+                  "🔠 Mã đơn hàng: <b>" + order.orderCode + "</b>\n" +
+                  "📦 <b>Danh sách món chọn:</b>\n" + itemsListStr;
 
         const url = "https://api.telegram.org/bot" + TELEGRAM_CONFIG.token + "/sendMessage";
         fetch(url, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ chat_id: TELEGRAM_CONFIG.chatId, text: msg, parse_mode: "HTML" })
-        }).catch(function(err) { console.error("Lỗi gửi Telegram:", err); });
+        }).catch(function(err) { console.error("Lỗi Telegram:", err); });
+    }
+
+    // 🔥 THUẬT TOÁN TỰ ĐỘNG XÓA LỊCH SỬ CŨ HƠN 10 NGÀY
+    function cleanOldOrders() {
+        const tenDaysInMs = 10 * 24 * 60 * 60 * 1000; // Quy đổi 10 ngày ra mili-giây
+        const cutOffTimestamp = Date.now() - tenDaysInMs; // Mốc thời gian giới hạn
+        
+        // Truy vấn tìm tất cả đơn hàng có mã timestamp nhỏ hơn mốc giới hạn và thực hiện xóa bỏ
+        database.ref('orders_history').orderByChild('timestamp').endAt(cutOffTimestamp).once('value', function(snapshot) {
+            snapshot.forEach(function(childSnapshot) {
+                childSnapshot.ref.remove();
+                console.log("Đã tự động xóa 1 đơn hàng cũ vượt quá hạn định 10 ngày.");
+            });
+        });
     }
 
     function finishCheckout() {
@@ -549,20 +504,24 @@
         updateCartState();
     }
 
-    function listenStaffOrders() {
-        database.ref('orders_history').limitToLast(10).on('value', function(snapshot) {
+    // ĐỒNG BỘ HIỂN THỊ VÀO BẢNG LỊCH SỬ ẨN CỦA ADMIN
+    function listenAdminOrders() {
+        database.ref('orders_history').limitToLast(30).on('value', function(snapshot) {
             const data = snapshot.val();
-            const box = document.getElementById('staff-orders-list');
+            const box = document.getElementById('admin-orders-list');
             box.innerHTML = '';
-            if(!data) return box.innerHTML = '<p style="color:#718096; font-size:13px; text-align:center;">Chưa có đơn hàng nào.</p>';
+            if(!data) return box.innerHTML = '<p style="color:#718096; font-size:13px; text-align:center;">Chưa lưu ghi nhận đơn hàng nào.</p>';
             
             for(let key in data) {
                 let o = data[key];
-                let hinhThuc = (o.payment === 'CASH') ? 'Tiền mặt' : 'Đã CK Bank';
+                let hinhThuc = (o.payment === 'CASH') ? '💵 Tiền mặt' : '💳 Chuyển khoản';
+                let chitietMon = o.items.map(function(i) { return i.name + ' (x' + i.quantity + ')'; }).join(', ');
+                
                 box.innerHTML += '<div class="order-row">' +
-                                 '📍 <b>' + o.court + ' - Khách: ' + o.customer + '</b> [Mã: ' + o.orderCode + ']<br>' +
-                                 '💰 Bill: <b>' + o.total.toLocaleString() + 'đ</b> (' + hinhThuc + ')<br>' +
-                                 '🕒 Thời gian: ' + o.time +
+                                 '📍 <b>' + o.court + ' - Khách: ' + o.customer + '</b> [Mã Đơn: ' + o.orderCode + ']<br>' +
+                                 '📦 Đồ gọi: <span style="color:var(--neon-blue);">' + chitietMon + '</span><br>' +
+                                 '💰 Tổng tiền: <b>' + o.total.toLocaleString() + 'đ</b> — Hình thức: <span style="color:#ff9900;">' + hinhThuc + '</span><br>' +
+                                 '🕒 Thời gian đặt đơn: <span style="color:#718096;">' + o.time + '</span>' +
                                  '</div>';
             }
         });
