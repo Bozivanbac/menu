@@ -59,7 +59,7 @@
         .p-name { font-weight: bold; font-size: 14px; margin-bottom: 5px; height: 40px; display: flex; align-items: center; justify-content: center; }
         .p-price { color: var(--neon-pink); font-weight: bold; margin-bottom: 8px; font-size: 14px; }
         
-        /* Nút xóa ẩn (Mật khẩu mới hiện) */
+        /* Nút xóa ẩn của Admin */
         .btn-delete-p { position: absolute; top: 5px; right: 5px; background: none; border: none; color: #4a5568; cursor: pointer; font-size: 14px; display: none; }
         .btn-delete-p:hover { color: var(--neon-pink); }
 
@@ -72,8 +72,16 @@
         .btn-admin { background: linear-gradient(45deg, #ff007f, #7928ca); color: #fff; }
         .btn-checkout { background: linear-gradient(45deg, #39ff14, #00ff87); color: #000; font-size: 16px; margin-top: 10px; padding: 12px; }
         
-        .cart-item { display: flex; justify-content: space-between; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px dashed rgba(255,255,255,0.1); font-size: 14px; }
-        
+        /* Nút tăng giảm số lượng trong Giỏ Hàng của Khách */
+        .cart-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px dashed rgba(255,255,255,0.1); }
+        .btn-qty {
+            background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15);
+            color: #fff; border-radius: 6px; padding: 3px 9px; cursor: pointer; font-size: 13px; font-weight: bold; transition: 0.2s;
+        }
+        .btn-qty:hover { background: var(--neon-blue); color: #000; border-color: var(--neon-blue); }
+        .btn-qty-del { background: rgba(255, 0, 127, 0.15); border-color: rgba(255, 0, 127, 0.2); color: var(--neon-pink); }
+        .btn-qty-del:hover { background: var(--neon-pink); color: #fff; }
+
         /* POPUP MODAL CHÍNH GIỮA MÀN HÌNH */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -83,17 +91,18 @@
         }
         .modal-box {
             background: #141821; border: 1px solid var(--neon-blue);
-            padding: 25px; border-radius: 16px; width: 100%; max-width: 400px;
+            padding: 25px; border-radius: 16px; width: 100%; max-width: 420px;
             text-align: center; box-shadow: 0 0 30px rgba(0, 242, 254, 0.3);
         }
         .modal-title { font-size: 1.3rem; color: var(--neon-blue); margin-bottom: 15px; font-weight: bold; text-transform: uppercase; }
         .modal-btn-group { display: flex; gap: 10px; margin-top: 15px; }
         .btn-modal-close { background: #4a5568; color: white; margin-top: 15px; }
         
-        #qr-modal-section { display: none; margin-top: 15px; background: #fff; padding: 15px; border-radius: 12px; color: #000; }
-        #qr-image { max-width: 180px; margin-top: 10px; width: 100%; border: 1px solid #eee; }
+        #qr-modal-section { display: none; margin-top: 15px; background: #fff; padding: 18px; border-radius: 12px; color: #000; }
+        #qr-image { max-width: 170px; margin-top: 5px; width: 100%; border: 1px solid #eee; border-radius: 8px; transition: 0.3s; }
+        #qr-image:hover { transform: scale(1.03); box-shadow: 0 0 10px rgba(0,0,0,0.15); }
         
-        /* Bảng Admin và Nhân viên ẩn mặc định */
+        /* Bảng Khu Vực Ẩn */
         #admin-panel, #staff-panel { display: none; }
         #admin-panel { border-color: var(--neon-pink); }
         #staff-panel { border-color: var(--neon-green); }
@@ -154,7 +163,7 @@
             <button class="btn btn-admin" onclick="adminAddProduct()">➕ ĐƯA LÊN HỆ THỐNG TRỰC TUYẾN</button>
         </div>
 
-        <!-- BẢNG LỊCH SỬ ĐƠN HÀNG TRỰC QUẦY CHO NHÂN VIÊN -->
+        <!-- BẢNG THEO DÕI ĐƠN DÀNH CHO NHÂN VIÊN QUẦY -->
         <div class="card" id="staff-panel">
             <h2>🚨 BẢNG KIỂM SOÁT ĐƠN HÀNG (NHÂN VIÊN)</h2>
             <div id="staff-orders-list"></div>
@@ -188,20 +197,16 @@
             </div>
         </div>
 
-        <!-- Bước 2: Hiện QR Hóa Đơn Chết -->
+        <!-- Bước 2: Hiện QR Chết & Deep Link tự mở App Bank -->
         <div id="qr-modal-section">
-            <p style="color: #000; font-weight: bold; font-size: 14px; margin-top: 0;">Mã QR Đã Nhập Sẵn Giá Tiền & Nội Dung</p>
-            <img id="qr-image" src="" alt="Mã QR Techcombank">
-            <div id="qr-info" style="color: #111; font-size: 13px; margin-top: 8px; font-weight: bold; white-space: pre-line;"></div>
-            <p style="font-size: 11px; color: #e53e3e; margin: 5px 0; font-weight: bold;">⚠️ Vui lòng KHÔNG tự sửa số tiền trên App Ngân Hàng</p>
-            <button class="btn btn-checkout" onclick="confirmQRPaid()">🚀 TÔI ĐÃ CHUYỂN KHOẢN XONG</button>
+            <!-- Phần này sẽ được điền tự động bằng Javascript phía dưới -->
         </div>
 
         <button class="btn btn-modal-close" onclick="closeCheckoutModal()">Đóng cửa sổ</button>
     </div>
 </div>
 
-<!-- Nút ngầm mở quyền admin -->
+<!-- Nút ngầm mở quyền quản lý -->
 <div class="admin-login-trigger" onclick="triggerAdminLogin()">🔒 Quản lý hệ thống Phúc An</div>
 
 <script>
@@ -221,11 +226,11 @@
 
     // ==================== 2. CẤU HÌNH BÁO ĐƠN QUA TELEGRAM BOT CỦA BẠN ====================
     const TELEGRAM_CONFIG = {
-        token: "7778945612:AAH...", // <--- DÁN TOKEN BOT CỦA BẠN VÀO ĐÂY
-        chatId: "-100..."          // <--- DÁN ID NHÓM CHAT TELEGRAM CỦA BẠN VÀO ĐÂY
+        token: "7778945612:AAH...", // <--- BẠN THAY MÃ TOKEN CỦA CON BOT BẠN VÀO ĐÂY
+        chatId: "-100..."          // <--- BẠN THAY ID NHÓM CHAT TELEGRAM CỦA BẠN VÀO ĐÂY
     };
 
-    // ==================== 3. THÔNG TIN NGÂN HÀNG TECHCOMBANK PHÚC AN ====================
+    // ==================== 3. THÔNG TIN NGÂN HÀNG TECHCOMBANK ĐỒNG BỘ TỪ HÓA ĐƠN ====================
     const BANK_CONFIG = {
         bankId: "TCB",
         accountNo: "666688887892",
@@ -235,7 +240,7 @@
     let products = [];
     let cart = [];
     let isAdminVerified = false;
-    let tempSavedOrderData = null; // Lưu trữ tạm thời thông tin đơn khi hiện QR
+    let tempSavedOrderData = null;
 
     // ĐỒNG BỘ THỰC ĐƠN TỪ FIREBASE REALTIME
     database.ref('menu_products').on('value', (snapshot) => {
@@ -271,12 +276,12 @@
         if(isAdminVerified) document.querySelectorAll('.btn-delete-p').forEach(btn => btn.style.display = 'block');
     }
 
-    // BẢO MẬT MẬT KHẨU PHUCAN2026$ ẨN BIỂU MẪU QUẢN TRỊ VÀ NÚT XÓA MÓN
+    // KHÓA MẬT KHẨU PHUCAN2026$
     function triggerAdminLogin() {
         let password = prompt("Nhập mã xác thực hệ thống Phúc An Badminton:");
         if (password === "PhucAn2026$") {
             isAdminVerified = true;
-            alert("🔓 Đã mở quyền quản trị kho hàng và theo dõi đơn thành công!");
+            alert("🔓 Đã mở quyền quản trị kho hàng thành công!");
             document.getElementById('admin-panel').style.display = 'block';
             document.getElementById('staff-panel').style.display = 'block';
             document.querySelectorAll('.btn-delete-p').forEach(btn => btn.style.display = 'block');
@@ -303,33 +308,81 @@
 
     function adminDeleteProduct(productId) {
         if (!isAdminVerified) return;
-        if (confirm("Bạn có chắc chắn muốn xóa món này không?")) database.ref(`menu_products/${productId}`).remove();
+        if (confirm("Xác nhận xóa món này?")) database.ref(`menu_products/${productId}`).remove();
     }
 
-    // THAO TÁC GIỎ HÀNG KHÁCH MUA
+    // THAO TÁC GIỎ HÀNG (THÊM, TĂNG, GIẢM, XÓA CHO KHÁCH)
     function addToCart(productId) {
         const product = products.find(p => p.id === productId);
         const itemInCart = cart.find(item => item.id === productId);
-        if (itemInCart) itemInCart.quantity += 1; else cart.push({ ...product, quantity: 1 });
+        if (itemInCart) {
+            itemInCart.quantity += 1;
+        } else {
+            cart.push({ ...product, quantity: 1 });
+        }
         renderCart();
     }
 
+    function increaseQuantity(productId) {
+        const item = cart.find(item => item.id === productId);
+        if (item) item.quantity += 1;
+        renderCart();
+    }
+
+    function decreaseQuantity(productId) {
+        const item = cart.find(item => item.id === productId);
+        if (item) {
+            item.quantity -= 1;
+            if (item.quantity <= 0) {
+                removeFromCart(productId);
+                return;
+            }
+        }
+        renderCart();
+    }
+
+    function removeFromCart(productId) {
+        cart = cart.filter(item => item.id !== productId);
+        renderCart();
+    }
+
+    // HIỂN THỊ GIỎ HÀNG CÓ ĐẦY ĐỦ NÚT ĐIỀU CHỈNH SỐ LƯỢNG
     function renderCart() {
         const content = document.getElementById('cart-content');
         const totalSpan = document.getElementById('total-price');
-        if (cart.length === 0) { content.innerHTML = '<p style="color:#718096;text-align:center;font-size:14px;">Chưa chọn món nào.</p>'; totalSpan.innerText = '0đ'; return; }
+        if (cart.length === 0) { 
+            content.innerHTML = '<p style="color:#718096;text-align:center;font-size:14px;">Chưa chọn món nào.</p>'; 
+            totalSpan.innerText = '0đ'; 
+            return; 
+        }
+        
         let html = '', total = 0;
         cart.forEach(item => {
-            let itemTotal = item.price * item.quantity; total += itemTotal;
-            html += `<div class="cart-item"><span>${item.name} <b>x${item.quantity}</b></span><span style="color:var(--neon-blue);">${itemTotal.toLocaleString()}đ</span></div>`;
+            let itemTotal = item.price * item.quantity; 
+            total += itemTotal;
+            html += `
+                <div class="cart-item">
+                    <div style="flex: 1; text-align: left; padding-right: 10px;">
+                        <span style="font-size: 14px; font-weight: bold; color: #fff;">${item.name}</span>
+                        <br>
+                        <span style="color: var(--neon-pink); font-size: 13px;">${itemTotal.toLocaleString()}đ</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <button class="btn-qty" onclick="decreaseQuantity('${item.id}')">−</button>
+                        <span style="min-width: 20px; text-align: center; font-weight: bold; font-size: 14px;">${item.quantity}</span>
+                        <button class="btn-qty" onclick="increaseQuantity('${item.id}')">+</button>
+                        <button class="btn-qty btn-qty-del" onclick="removeFromCart('${item.id}')" title="Xóa món này">🗑️</button>
+                    </div>
+                </div>
+            `;
         });
-        content.innerHTML = html; totalSpan.innerText = total.toLocaleString() + 'đ';
+        content.innerHTML = html; 
+        totalSpan.innerText = total.toLocaleString() + 'đ';
     }
 
-    // BẬT MODAL CHỌN THANH TOÁN CHÍNH GIỮA MÀN HÌNH
     function openCheckoutModal() {
         const customer = document.getElementById('customer-name').value.trim();
-        if (!customer) return alert("Quý khách vui lòng điền Tên của mình trước khi mua hàng!");
+        if (!customer) return alert("Quý khách vui lòng điền Tên/Số điện thoại để nhân viên biết giao đồ tận sân nhé!");
         if (cart.length === 0) return alert("Giỏ hàng đang trống!");
 
         document.getElementById('modal-header-title').innerText = "Chọn Thanh Toán";
@@ -342,12 +395,12 @@
         document.getElementById('checkout-modal').style.display = 'none';
     }
 
-    // XỬ LÝ HÓA ĐƠN THEO PHƯƠNG THỨC KHÁCH CHỌN
+    // XỬ LÝ KHÁCH CHỌN PHƯƠNG THỨC THANH TOÁN
     function processOrder(method) {
         const customer = document.getElementById('customer-name').value.trim();
         const court = document.getElementById('court-number').value;
         let total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-        const orderCode = "PA" + Math.floor(1000 + Math.random() * 9000); // Tạo mã đơn hàng chết dạng PA4321
+        const orderCode = "PA" + Math.floor(1000 + Math.random() * 9000); 
 
         tempSavedOrderData = {
             orderCode: orderCode,
@@ -360,39 +413,62 @@
         };
 
         if (method === 'CASH') {
-            // TIỀN MẶT: Bắn đơn đi ngay lập tức
             saveAndSendOrder(tempSavedOrderData, '💵 Tiền mặt tại quầy');
-            alert(`🎉 Đơn đặt hàng thành công! Quý khách vui lòng chuẩn bị ${total.toLocaleString()}đ tiền mặt phục vụ tại quầy.`);
+            alert(`🎉 Đơn đặt hàng thành công! Quý khách vui lòng chuẩn bị ${total.toLocaleString()}đ tiền mặt.`);
             finishCheckout();
         } else {
-            // CHUYỂN KHOẢN: Tạo QR Chết dẫn sâu thẳng vào App Ngân Hàng với số tiền cố định
             document.getElementById('modal-step-choice').style.display = 'none';
-            document.getElementById('modal-header-title').innerText = "Thanh Toán VietQR";
+            document.getElementById('modal-header-title').innerText = "Thanh Toán Hóa Đơn";
             
-            const description = orderCode; // Nội dung ghi đúng mã đơn hàng để đối chiếu nhanh
+            const description = orderCode;
+            
+            // 1. Link ảnh mã QR hiển thị ra màn hình
             const qrUrl = `https://img.vietqr.io/image/${BANK_CONFIG.bankId}-${BANK_CONFIG.accountNo}-compact.png?amount=${total}&addInfo=${encodeURIComponent(description)}&accountName=${encodeURIComponent(BANK_CONFIG.accountName)}`;
             
-            document.getElementById('qr-image').src = qrUrl;
-            document.getElementById('qr-info').innerText = `Chủ TK: ${BANK_CONFIG.accountName}\nSTK: ${BANK_CONFIG.accountNo}\nSố tiền hóa đơn: ${total.toLocaleString()}đ\nNội dung: ${orderCode}`;
+            // 2. Link Deep Link thông minh tự nhận diện thiết bị để tự động mở các App Ngân hàng nội địa dính sẵn số tiền chết
+            const bankAppDeepLink = `https://link.vietqr.io/${BANK_CONFIG.bankId}/${BANK_CONFIG.accountNo}/${total}/${encodeURIComponent(description)}?accountName=${encodeURIComponent(BANK_CONFIG.accountName)}`;
+            
+            // Đổ cấu trúc giao diện mới vào vùng hiển thị QR
+            document.getElementById('qr-modal-section').innerHTML = `
+                <p style="color: #000; font-weight: bold; font-size: 14px; margin: 0 0 5px 0;">Mã QR Gài Sẵn Số Tiền Hóa Đơn</p>
+                
+                <a href="${bankAppDeepLink}" target="_blank" title="Chạm vào đây để mở nhanh app ngân hàng">
+                    <img id="qr-image" src="${qrUrl}" alt="Mã QR Techcombank">
+                </a>
+                
+                <div id="qr-info" style="color: #111; font-size: 13px; margin: 10px 0; font-weight: bold; text-align: left; background:#f7fafc; padding:10px; border-radius:6px; border:1px solid #e2e8f0;">
+                    📍 Chủ TK: HKD PHUC AN<br>
+                    💳 Số TK: ${BANK_CONFIG.accountNo}<br>
+                    💰 Số tiền: <span style="color:var(--neon-pink);">${total.toLocaleString()}đ</span><br>
+                    🔠 Nội dung: <span style="color:blue;">${orderCode}</span>
+                </div>
+                
+                <!-- NÚT BẤM KÍCH HOẠT MỞ THẲNG APP NGÂN HÀNG CỦA KHÁCH -->
+                <a href="${bankAppDeepLink}" target="_blank" style="text-decoration: none; display: block; margin-bottom: 12px;">
+                    <button class="btn" style="background: linear-gradient(45deg, #ff007f, #7928ca); color: #fff; padding: 12px; font-size:14px; box-shadow: 0 0 15px rgba(255, 0, 127, 0.4);">
+                        📲 TỰ ĐỘNG MỞ APP NGÂN HÀNG
+                    </button>
+                </a>
+                
+                <p style="font-size: 11px; color: #718096; margin: 5px 0 10px 0;">(Bấm nút màu tím phía trên để mở thẳng app Bank trên máy của bạn, hoặc dùng máy khác quét hình QR)</p>
+                <button class="btn btn-checkout" onclick="confirmQRPaid()">🚀 TÔI ĐÃ CHUYỂN KHOẢN XONG</button>
+            `;
+            
             document.getElementById('qr-modal-section').style.display = 'block';
         }
     }
 
-    // BẤM XÁC NHẬN SAU KHI QUÉT QR XONG
     function confirmQRPaid() {
         if (tempSavedOrderData) {
             saveAndSendOrder(tempSavedOrderData, '💳 Chuyển khoản qua QR (Khách báo đã chuyển)');
-            alert(`🎉 Hệ thống ghi nhận thành công! Nhân viên Phúc An sẽ kiểm tra tài khoản và mang đồ đến ngay ${tempSavedOrderData.court} cho bạn.`);
+            alert(`🎉 Đơn hàng đã gửi thành công! Nhân viên sẽ kiểm tra biến động số dư và mang đồ đến ngay ${tempSavedOrderData.court}.`);
             finishCheckout();
         }
     }
 
-    // LƯU LÊN DATABASE VÀ BẮN TIN NHẮN ĐẾN MÁY NHÂN VIÊN QUA TELEGRAM
     function saveAndSendOrder(order, paymentStr) {
-        // Đẩy nhật ký lưu trữ lên Firebase
         database.ref('orders_history').push(order);
 
-        // Soạn cấu trúc tin nhắn rõ ràng gửi đến nhóm chat của nhân viên
         let itemsListStr = order.items.map(i => `• ${i.name} (x${i.quantity})`).join('\n');
         let msg = `🔔 <b>ĐƠN HÀNG MỚI TẠI SÂN</b>\n`;
         msg += `----------------------------------\n`;
@@ -419,19 +495,18 @@
         renderCart();
     }
 
-    // PANEL THEO DÕI ĐƠN HÀNG DÀNH RIÊNG CHO MÁY NHÂN VIÊN TRỰC QUẦY
     function listenStaffOrders() {
         database.ref('orders_history').limitToLast(10).on('value', (snapshot) => {
             const data = snapshot.val();
             const box = document.getElementById('staff-orders-list');
             box.innerHTML = '';
-            if(!data) return box.innerHTML = '<p style="color:#718096; font-size:13px; text-align:center;">Chưa có đơn hàng nào hôm nay.</p>';
+            if(!data) return box.innerHTML = '<p style="color:#718096; font-size:13px; text-align:center;">Chưa có đơn hàng nào.</p>';
             
             for(let key in data) {
                 let o = data[key];
                 box.innerHTML += `
                     <div class="order-row">
-                        📍 <b>${o.court} - Khách: ${o.customer}</b> [Mã đơn: ${o.orderCode}]<br>
+                        📍 <b>${o.court} - Khách: ${o.customer}</b> [Mã: ${o.orderCode}]<br>
                         💰 Bill: <b>${o.total.toLocaleString()}đ</b> (${o.payment === 'CASH' ? 'Tiền mặt' : 'Đã quét QR'})<br>
                         🕒 Thời gian: ${o.time}
                     </div>
