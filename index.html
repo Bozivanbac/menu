@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Phúc An Badminton - Menu Tự Động</title>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     
     <style>
         :root {
@@ -236,8 +234,11 @@
 
 <div class="admin-login-trigger" onclick="triggerAdminLogin()">🔒 Quản lý hệ thống Phúc An</div>
 
-<script>
-    // ==================== 1. CẤU HÌNH HỆ THỐNG DATA FIREBASE ====================
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getDatabase, ref, onValue, push, remove, query, orderByChild, endAt, get, limitToLast } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+    // CẤU HÌNH LIÊN KẾT ĐÁM MÂY FIREBASE
     const firebaseConfig = {
         apiKey: "AIzaSyCc0CLn5AWsQ6qzd9EIRvf4H_Lw6dcZRoM",
         authDomain: "menu-68f29.firebaseapp.com",
@@ -248,10 +249,11 @@
         appId: "1:677638363904:web:e2136140f2226d602371e5",
         measurementId: "G-YNHPWJK3Y9"
     };
-    firebase.initializeApp(firebaseConfig);
-    const database = firebase.database();
+    
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
 
-    // ==================== 2. CẤU HÌNH ĐỊA CHỈ NHÓM TELEGRAM CHUẨN ====================
+    // CẤU HÌNH TELEGRAM GỬI TIN VÀO NHÓM MỚI "QUẦY Nước Online"
     const TELEGRAM_CONFIG = {
         token: "8689079359:AAGxxLAX7BiqbMJKnIxcGvVvk9n_Uqd9CfA", 
         chatId: "-1004295903645"                                    
@@ -269,8 +271,8 @@
         }
     });
 
-    // LẤY DỮ LIỆU TỪ FIREBASE REALTIME
-    database.ref('menu_products').on('value', function(snapshot) {
+    // ĐỒNG BỘ THỰC ĐƠN TỪ FIREBASE REALTIME MỚI
+    onValue(ref(database, 'menu_products'), (snapshot) => {
         const data = snapshot.val();
         products = [];
         if (data) {
@@ -279,7 +281,7 @@
         renderProducts();
     });
 
-    // HIỂN THỊ MÓN ĂN/NƯỚC UỐNG
+    // HIỂN THỊ SẢN PHẨM RA MÀN HÌNH
     function renderProducts() {
         const drinkGrid = document.getElementById('drink-list');
         const accessoryGrid = document.getElementById('accessory-list');
@@ -319,7 +321,7 @@
         if(isAdminVerified) document.querySelectorAll('.btn-delete-p').forEach(btn => btn.style.display = 'block');
     }
 
-    // ĐĂNG NHẬP ADMIN BẰNG MẬT KHẨU
+    // ĐĂNG NHẬP HỆ THỐNG QUẢN LÝ QUẦY
     function triggerAdminLogin() {
         let password = prompt("Nhập mã xác thực hệ thống Phúc An Badminton:");
         if (password === "PhucAn2026$") {
@@ -342,7 +344,7 @@
         const categorySelect = document.getElementById('admin-p-category');
         if (!nameInput.value || !priceInput.value) return alert("Vui lòng điền đủ tên món và giá!");
         
-        database.ref('menu_products').push({
+        push(ref(database, 'menu_products'), {
             name: nameInput.value,
             price: parseInt(priceInput.value),
             category: categorySelect.value
@@ -352,10 +354,10 @@
 
     function adminDeleteProduct(productId) {
         if (!isAdminVerified) return;
-        if (confirm("Xác nhận xóa món này?")) database.ref('menu_products/' + productId).remove();
+        if (confirm("Xác nhận xóa món này?")) remove(ref(database, 'menu_products/' + productId));
     }
 
-    // QUẢN LÝ ĐƠN HÀNG TRONG GIỎ
+    // LOGIC ĐẶT GIỎ HÀNG
     function addToCart(productId) {
         const product = products.find(p => p.id === productId);
         const itemInCart = cart.find(item => item.id === productId);
@@ -429,7 +431,7 @@
         finishCheckout();
     }
 
-    // ⚡ XỬ LÝ ĐƠN HÀNG SIÊU TỐC - HIỂN THỊ TRƯỚC BẮN TIN CHẠY NGẦM SAU
+    // ⚡ XỬ LÝ ĐƠN HÀNG SIÊU TỐC KHÔNG ĐỘ TRỄ MẠNG
     function processOrder(method) {
         const customer = document.getElementById('customer-name').value.trim();
         const court = document.getElementById('court-number').value;
@@ -458,10 +460,8 @@
             paymentStrTelegram = "🔵 <b>[ KHÁCH CHUYỂN KHOẢN ]</b> 🔵";
         }
 
-        // Đóng giao diện nạp tiền ngay lập tức
         closeCheckoutModal();
         
-        // 💬 Bật thông báo thành công ra ngay chính giữa màn hình (Không sợ nghẽn mạng)
         let textAlert = "📍 Điểm nhận: " + orderData.court + "\n" +
                         "👤 Khách hàng: " + orderData.customer + "\n" +
                         "💰 Tổng thanh toán: " + orderData.total.toLocaleString() + "đ\n" +
@@ -470,23 +470,20 @@
                         "Hệ thống đã tiếp nhận yêu cầu. Đồ dùng đang được nhân viên chuẩn bị mang đến tận sân!";
         openSuccessModal(textAlert);
 
-        // Kích hoạt tiến trình đồng bộ bất đồng bộ ngầm
         saveAndSendOrderSilent(orderData, paymentStrTelegram);
     }
 
-    // ĐỒNG BỘ ĐƠN NGẦM SONG SONG
+    // TIẾN TRÌNH KHÔNG ĐỒNG BỘ ĐỒNG THỜI CHẠY NGẦM
     function saveAndSendOrderSilent(order, paymentStr) {
-        // Ghi lên dữ liệu đám mây Firebase
-        database.ref('orders_history').push(order)
+        push(ref(database, 'orders_history'), order)
         .then(function() {
-            console.log("Đã đồng bộ đơn lên Firebase thành công.");
+            console.log("Firebase đã nạp xong.");
             cleanOldOrders();
         })
         .catch(function(err) {
-            console.error("Lỗi đồng bộ Firebase:", err);
+            console.error("Firebase sync error:", err);
         });
 
-        // Bắn dữ liệu về Telegram nhóm qua Fetch API ngầm
         let itemsListStr = order.items.map(function(i) { return "• " + i.name + " (x" + i.quantity + ")"; }).join("\n");
         let msg = "🔔 <b>ĐƠN HÀNG MỚI TẠI SÂN</b>\n" +
                   "----------------------------------\n" +
@@ -507,23 +504,23 @@
         .then(res => res.json())
         .then(resData => {
             if(!resData.ok) {
-                console.error("Telegram báo lỗi:", resData.description);
+                console.error("Lỗi Telegram:", resData.description);
             }
         })
         .catch(function(err) { console.error("Lỗi mạng kết nối Telegram:", err); });
     }
 
-    // DỌN DẸP LỊCH SỬ QUÁ 10 NGÀY TỰ ĐỘNG
+    // TỰ ĐỘNG DỌN DẸP LỊCH SỬ QUÁ 10 NGÀY
     function cleanOldOrders() {
         const tenDaysInMs = 10 * 24 * 60 * 60 * 1000; 
         const cutOffTimestamp = Date.now() - tenDaysInMs; 
         
-        database.ref('orders_history').orderByChild('timestamp').endAt(cutOffTimestamp).once('value', function(snapshot) {
-            snapshot.forEach(function(childSnapshot) {
-                childSnapshot.ref.remove();
-                console.log("Đã dọn đơn cũ.");
+        const oldOrdersQuery = query(ref(database, 'orders_history'), orderByChild('timestamp'), endAt(cutOffTimestamp));
+        get(oldOrdersQuery).then((snapshot) => {
+            snapshot.forEach((childSnapshot) => {
+                remove(ref(database, 'orders_history/' + childSnapshot.key));
             });
-        });
+        }).catch(err => console.error(err));
     }
 
     function finishCheckout() {
@@ -534,7 +531,8 @@
 
     // ĐỒNG BỘ HIỂN THỊ KHO LỊCH SỬ DÀNH CHO ADMIN
     function listenAdminOrders() {
-        database.ref('orders_history').limitToLast(30).on('value', function(snapshot) {
+        const adminOrdersQuery = query(ref(database, 'orders_history'), limitToLast(30));
+        onValue(adminOrdersQuery, (snapshot) => {
             const data = snapshot.val();
             const box = document.getElementById('admin-orders-list');
             box.innerHTML = '';
@@ -562,6 +560,19 @@
             }
         });
     }
+
+    // ĐẨY HÀM RA WINDOW SCOPE ĐỂ TRÁNH LỖI ONCLICK HTML KHÔNG NHẬN TRONG ES MODULES
+    window.triggerAdminLogin = triggerAdminLogin;
+    window.adminAddProduct = adminAddProduct;
+    window.adminDeleteProduct = adminDeleteProduct;
+    window.addToCart = addToCart;
+    window.increaseQuantity = increaseQuantity;
+    window.decreaseQuantity = decreaseQuantity;
+    window.openCheckoutModal = openCheckoutModal;
+    window.closeCheckoutModal = closeCheckoutModal;
+    window.openSuccessModal = openSuccessModal;
+    window.closeSuccessModal = closeSuccessModal;
+    window.processOrder = processOrder;
 </script>
 </body>
 </html>
